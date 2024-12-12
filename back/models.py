@@ -33,10 +33,6 @@ class Diary(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     emotion_id = db.Column(db.Integer, db.ForeignKey('emotions.id'), nullable=False)
-    
-    user = db.relationship('User', backref='diaries')  # `diaries`로 역참조
-    emotion = db.relationship('Emotion', backref='diaries')  # `diaries`로 역참조
-    
 
 class Emotion(db.Model):
     __tablename__ = 'emotions'
