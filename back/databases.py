@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 basdir = os.path.abspath(os.path.dirname('../db/'))
 
 # basdir 경로안에 DB파일 만들기
-dbfile = os.path.join(basdir, 'techit-diary')
+dbfile = os.path.join(basdir, 'techit-diary.db')
 
 connection_string = 'sqlite:///' + dbfile
 

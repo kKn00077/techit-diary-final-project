@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today I Feel</title>
+</head>
+<body>
+    <h1>오늘의 일기를 작성하세요!</h1>
+    <form action="/diary/create" method="POST">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="contents">Contents:</label><br>
+        <textarea id="contents" name="contents" rows="5" cols="50" required></textarea><br><br>
+
+        <button type="submit">Submit</button>
+    </form>    
+</body>
+</html>

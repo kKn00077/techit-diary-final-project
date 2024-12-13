@@ -3,6 +3,7 @@ from databases import connection_string, db
 from login import login_manager
 # from blueprints.auth.view import auth
 # from blueprints.diary.view import diary
+from blueprints.diary import diary_bp
 from views import setup_routes
 
 app = Flask(__name__)
@@ -21,6 +22,8 @@ login_manager.init_app(app)
 
 # app.register_blueprint(auth, url_prefix='/auth')
 # app.register_blueprint(diary, url_prefix='/diary')
+app.register_blueprint(diary_bp, url_prefix='/diary')
+
 
 with app.app_context():
     import models
