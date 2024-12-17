@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1 style="text-align: center;">이번주 감정 그래프</h1>
+    <!-- 주간 평균 감정 점수를 라인 차트로 표시 -->
+    <canvas id="weeklyLine" width="400" height="200"></canvas>
+    <script>
+        fetch('/diary/score')
+            .then(response => response.json())
+            .then(avg_scores => {
+                if (avg_scores.code === 200) {
+                    const results = avg_scores.body.body;
+                    const labels = results.map(item => item.day);
+                    const scores = results.map(item => item.average_score);
+                    const counts = results.map(item => item.count);
+
+                    const ctx = document.getElementById('weeklyLine').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '감정 점수',
+                                data: scores,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderWidth: 2,
+                                tension: 0.1, // 라인 곡률 조정 (0일 경우 직선)
+                                fill: true, // 영역 채우기
+                                pointRadius: 6,       // 점 크기 (기본값:3)
+                                pointHoverRadius: 18   // 마우스 오버 시 점 크기 (기본값:4)
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        font: {
+                                            size: 14 // X축 폰트 크기
+                                        }
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    max: 10,
+                                    ticks: {
+                                        font: {
+                                            size: 14 // Y축 폰트 크기
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const index = context.dataIndex;
+                                            const score = context.raw.toFixed(2); // 점수
+                                            const count = counts[index] ?? 0;  // 일기 개수
+                                            return `평균 점수: ${score} (일기 ${count}개)`;
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+                                        font: {
+                                            size: 16 // Legend 폰트 크기
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else if (avg_scores.code === 400) {
+                    alert(avg_scores.body.message);
+                } else {
+                    alert('데이터를 불러오는 중 문제가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+
+    <hr>
+
+    <h1 style="text-align: center;">감정별 분포</h1>
+    <!-- 11가지 감정별 백분율을 바 차트로 표시, X축에 SVG 아이콘 사용 -->
+    <canvas id="emotionBar" width="600" height="400"></canvas>
+    <script>
+        const label_decoding = {
+            0: '기쁨(Joy)', 1: '슬픔(Sadness)', 2: '화남(Anger)', 3: '까칠함(Disgust)',
+            4: '두려움(Fear)', 5: '불안함(Anxiety)', 6: '부러움(Envy)', 7: '따분함(Ennui)',
+            8: '당황함(Embarrassment)', 9: '추억(Nostalgia)', 10: '중립(Neutral)'
+        };
+        
+        // 감정명: 이미지 경로 매핑
+        const emotionImages = {
+            '기쁨(Joy)': '/diary/static/emoji/Joy.svg',
+            '슬픔(Sadness)': '/diary/static/emoji/Sadness.svg',
+            '화남(Anger)': '/diary/static/emoji/Anger.svg',
+            '까칠함(Disgust)': '/diary/static/emoji/Disgust.svg',
+            '두려움(Fear)': '/diary/static/emoji/Fear.svg',
+            '불안함(Anxiety)': '/diary/static/emoji/Anxiety.svg',
+            '부러움(Envy)': '/diary/static/emoji/Envy.svg',
+            '따분함(Ennui)': '/diary/static/emoji/Ennui.svg',
+            '당황함(Embarrassment)': '/diary/static/emoji/Embarrassment.svg',
+            '추억(Nostalgia)': '/diary/static/emoji/Nostalgia.svg',
+            '중립(Neutral)': '/diary/static/emoji/Neutral.svg'
+        };
+
+        const labelsBar = Object.values(label_decoding);
+
+        // 모든 이미지를 사전에 로드
+        const preloadedImages = {};
+        for (const [emotion, path] of Object.entries(emotionImages)) {
+            const img = new Image();
+            img.src = path;
+            preloadedImages[emotion] = img;
+        }
+
+        // 아이콘을 막대 위로 그리기 위해 afterDatasetsDraw 사용
+        const xAxisImagePlugin = {
+          id: 'xAxisImagePlugin',
+          afterDatasetsDraw: (chart) => {
+            const xAxis = chart.scales.x;
+            const ctx = chart.ctx;
+
+            xAxis.ticks.forEach((tick, index) => {
+              const label = chart.data.labels[index];
+              if (!label) return;
+              const img = preloadedImages[label];
+              if (!img) return;
+
+              const x = xAxis.getPixelForTick(index);
+              const y = xAxis.bottom; 
+              const imgSize = 40;
+
+              // 이미지가 막대보다 위에 그려질 수 있도록 afterDatasetsDraw에서 렌더링
+              ctx.drawImage(img, x - (imgSize/2), y - imgSize, imgSize, imgSize); 
+            });
+          }
+        };
+
+        fetch('/diary/distribution')
+            .then(response => response.json())
+            .then(distribution => {
+                if (distribution.code === 200) {
+                    const rawData = distribution.body.body;
+                    const dataValues = rawData.map(item => item.percentage); // 11개 감정에 대한 백분율 리스트
+                    const rawCounts = rawData.map(item => item.count); // 개수 추가
+
+                    const ctxBar = document.getElementById('emotionBar').getContext('2d');
+                    new Chart(ctxBar, {
+                        type: 'bar',
+                        data: {
+                            labels: labelsBar,
+                            datasets: [{
+                                label: '감정 분포 (%)',
+                                data: dataValues,
+                                backgroundColor: 'rgba(75,192,192,0.5)',
+                                borderColor: 'rgba(75,192,192,1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        display: false,
+                                        font: {
+                                            size: 14 // X축 폰트 크기
+                                        }
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        },
+                                        font: {
+                                            size: 14 // Y축 폰트 크기
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    enabled: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const index = context.dataIndex;
+                                            const percentage = context.raw.toFixed(2); // 퍼센트 값
+                                            const count = rawCounts[index] ?? 0;  // 개수
+                                            return `${percentage}% (${count}개)`;
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        font: {
+                                            size: 16 // Legend 폰트 크기
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [xAxisImagePlugin]
+                    });
+                } else if (distribution.code === 400) {
+                    alert(distribution.body.message);
+                } else {
+                    alert('데이터를 불러오는 중 문제가 발생했습니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+    </script>
+</body>
+</html>
