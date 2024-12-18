@@ -34,6 +34,9 @@ class Diary(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     emotion_id = db.Column(db.Integer, db.ForeignKey('emotions.id'), nullable=False)
 
+    tags = db.Column(db.Text, nullable=True)  # 추가
+    advice = db.Column(db.Text, nullable=True) # 추가
+
 class Emotion(db.Model):
     __tablename__ = 'emotions'
     

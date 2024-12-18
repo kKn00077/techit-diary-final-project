@@ -50,7 +50,7 @@ def classify_emotion(text):
         predicted_label = torch.argmax(logits, dim=-1).item()
     return label_decoding[predicted_label]
 
-# OpenAI API 키 설정 (실제키는 추후 전달)
+# OpenAI API 키 설정 (실제키는 디스코드 1조 참조)
 client = OpenAI(api_key = "YOUR-OPENAI-API-KEY")
 
 # OpenAI API를 사용한 태그 생성 함수
@@ -121,12 +121,18 @@ def create_diary():
             # 태그 추출
             combined_text = f"{title} {contents}"
             tags = extract_tags(combined_text)
+            tags_str = ", ".join(tags)  # 리스트를 문자열로 변환
 
             # 조언 생성(100자 제한)
             advice = generate_advice(combined_text)
 
             # 데이터베이스 저장
-            diary_entry = Diary(user_id=session['user_id'], emotion_id=emotion_id, title=title, contents=contents)
+            diary_entry = Diary(user_id=session['user_id'], 
+                                emotion_id=emotion_id, 
+                                title=title, 
+                                contents=contents,
+                                tags=tags_str, #변환된 문자열 사용
+                                advice=advice)
             db.session.add(diary_entry)
             db.session.commit()
 
@@ -141,7 +147,7 @@ def create_diary():
                         "contents": diary_entry.contents,
                         "emotion": emotion,
                         "emotion_id": emotion_id,
-                        "tags" : tags,
+                        "tags" : tags_str.split(", "),  # 다시 리스트로 변환
                         "advice" : advice
                     }
                 }
