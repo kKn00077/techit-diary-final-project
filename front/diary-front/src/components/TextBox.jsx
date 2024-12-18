@@ -6,7 +6,7 @@ export default function TextBox({ type, placeholder }) {
 		1: (
 			<input
 				type="text"
-				class={`border-0 border-b  border-b-Purple-purple-200 focus:border-0 focus:border-b-2 focus:border-b-Purple-purple-400 py-2 ${defaultClass}`}
+				class={`border-0 border-b  border-b-Purple-purple-200 focus:border-0 focus:border-b focus:border-b-Purple-purple-500 py-2 ${defaultClass}`}
 				placeholder={placeholder}
 			/>
 		),
