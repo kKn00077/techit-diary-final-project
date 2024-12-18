@@ -3,7 +3,7 @@ import AuthCard from '@/components/auth/AuthCard'
 export default function LoginView() {
 	return (
 		<div>
-			<AuthCard type="login" />
+			<AuthCard type="join" />
 		</div>
 	)
 }

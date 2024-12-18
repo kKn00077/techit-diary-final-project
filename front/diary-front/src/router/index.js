@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthLayout from '../views/Layouts/AuthLayout.jsx'
 import LoginView from '@/views/pages/LoginView.jsx'
+import JoinView from '@/views/pages/JoinView.jsx'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,11 +14,11 @@ const router = createRouter({
 				{
 					path: 'login',
 					component: () => LoginView
+				},
+				{
+					path: 'join',
+					component: () => JoinView
 				}
-				// {
-				// 	path: 'join',
-				// 	component: () => import('../views/JoinView.vue')
-				// }
 			]
 		}
 	]
