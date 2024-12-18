@@ -36,19 +36,19 @@ export default {
 				xs: '0.625rem',
 				sm: '0.8125rem',
 				base: '1rem',
-				lg: '1.25rem',
-				xl: '1.5625rem',
-				'2xl': '1.9375rem',
-				'3xl': '2.4375rem',
-				'4xl': '3.0625rem',
-				'5xl': '3.8125rem'
+				md: '1.25rem',
+				lg: '1.5625rem',
+				xl: '1.9375rem',
+				'2xl': '2.4375rem',
+				'3xl': '3.0625rem',
+				'4xl': '3.8125rem'
 			},
 			fontFamily: {
 				'gowun-batang': 'Gowun Batang',
 				'gowun-dodum': 'Gowun Dodum'
 			},
 			boxShadow: {
-				'card/shadow': '4px 4px 16px 0px rgba(208,208,229,1)'
+				card: '4px 4px 16px 0px rgba(208,208,229,1)'
 			},
 			borderRadius: {
 				'rounded-0': '0rem',
