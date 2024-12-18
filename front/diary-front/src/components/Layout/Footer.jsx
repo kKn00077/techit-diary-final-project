@@ -6,7 +6,7 @@ export default function Footer({ mode = 1 }) {
 
 	return (
 		<footer
-			className={`w-full text-xs text-center font-gowun-dodum ${modeSwitch.className}`}>
+			className={`w-full text-xs custom-text-xs text-center font-gowun-dodum ${modeSwitch.className}`}>
 			Copyright 2024. 멋쟁이사자처럼 AI 웹 서비스 스쿨 1기 필승1조. All rights
 			reserved.
 		</footer>

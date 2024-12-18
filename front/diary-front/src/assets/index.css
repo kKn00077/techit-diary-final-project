@@ -5,3 +5,23 @@
 .card {
 	@apply bg-Black-black-200 shadow-card z-50;
 }
+
+@layer utilities {
+	.custom-text-4xl,
+	.custom-text-3xl,
+	.custom-text-2xl,
+	.custom-text-xl,
+	.custom-text-lg {
+		@apply leading-tight tracking-tight;
+	}
+
+	.custom-text-base,
+	.custom-text-md {
+		@apply leading-normal tracking-tight;
+	}
+
+	.custom-text-sm,
+	.custom-text-xs {
+		@apply leading-relaxed tracking-tight;
+	}
+}

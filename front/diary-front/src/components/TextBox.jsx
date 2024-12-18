@@ -1,6 +1,6 @@
 export default function TextBox({ type, placeholder }) {
 	const defaultClass =
-		'bg-Black-black-200 placeholder-Black-black-700 text-Black-black-900 focus:outline-none font-gowun-dodum text-base px-5 focus:border-0'
+		'bg-Black-black-200 placeholder-Black-black-700 text-Black-black-900 focus:outline-none font-gowun-dodum text-base custom-text-base px-5 focus:border-0'
 
 	const textBox = {
 		1: (
