@@ -7,7 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1 style="text-align: center;">이번주 감정 그래프</h1>
+    <h1 style="text-align: center;">주간 감정 그래프</h1>
+    <!-- 주간 평균 감정 점수 표시 -->
+    <h2 style="text-align: center;">주간 감정 점수: {{ average_score }}</h2>
     <!-- 주간 평균 감정 점수를 라인 차트로 표시 -->
     <canvas id="weeklyLine" width="400" height="200"></canvas>
     <script>
@@ -69,6 +71,7 @@
                                     }
                                 },
                                 legend: {
+                                    display: false,
                                     labels: {
                                         font: {
                                             size: 16 // Legend 폰트 크기
@@ -204,7 +207,7 @@
                                     }
                                 },
                                 legend: {
-                                    display: true,
+                                    display: false,
                                     labels: {
                                         font: {
                                             size: 16 // Legend 폰트 크기

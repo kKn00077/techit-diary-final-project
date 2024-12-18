@@ -4,6 +4,7 @@ import os
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime, timedelta
+from openai import OpenAI
 
 
 # 블루프린트 정의 (템플릿 폴더 경로 추가)
@@ -49,6 +50,48 @@ def classify_emotion(text):
         predicted_label = torch.argmax(logits, dim=-1).item()
     return label_decoding[predicted_label]
 
+# OpenAI API 키 설정 (실제키는 추후 전달)
+client = OpenAI(api_key = "YOUR-OPENAI-API-KEY")
+
+# OpenAI API를 사용한 태그 생성 함수
+def extract_tags(text):
+    try:
+        # chat.completion API 호출
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # 지원 가능한 모델 (gpt-4, gpt-4o, gpt-4o-mini, gpt-3.5-turbo)
+            messages=[
+                {
+                    "role": "user", 
+                    "content": f"Extract up to 3 concise hashtags that best describe the following text: '{text}'"}
+            ],
+            max_tokens=50  # 응답의 최대 토큰 수
+        )
+        # 응답에서 태그 추출
+        tags = response.choices[0].message.content.strip().split(", ")
+        return [tag.strip() for tag in tags if tag]  # 태그 리스트 반환
+    except Exception as e:
+        # 에러 발생 시 기본 태그 반환
+        return ["#Today", "#I", "#Feel"]
+
+# OpenAI API를 사용한 조언 생성 함수
+def generate_advice(text):
+    try:
+        # chat.completion API 호출
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # 지원 가능한 모델 (gpt-4, gpt-4o, gpt-4o-mini, gpt-3.5-turbo)
+            messages=[
+                {"role": "system", "content": "당신은 지혜롭고 친절한 심리치료사입니다. 50자 이내로 한국어로 조언을 제공하세요."},
+                {"role": "user", "content": f"이 상황에 대한 조언을 짧게 해주세요: '{text}'"}
+            ],
+            max_tokens=50  # 응답의 최대 토큰 수
+        )
+        # 조언 추출 및 길이 제한
+        advice = response.choices[0].message.content.strip()
+        return advice[:100]  # 최대 100자까지 반환
+    except Exception as e:
+        # 에러 발생 시 기본 조언 반환
+        return "Today I Feel."
+
 
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
@@ -75,6 +118,13 @@ def create_diary():
             emotion = classify_emotion(f"{title} {contents}")
             emotion_id = label_to_id.get(emotion, 11)  # 디폴트값 : 중립(Neutral)
 
+            # 태그 추출
+            combined_text = f"{title} {contents}"
+            tags = extract_tags(combined_text)
+
+            # 조언 생성(100자 제한)
+            advice = generate_advice(combined_text)
+
             # 데이터베이스 저장
             diary_entry = Diary(user_id=session['user_id'], emotion_id=emotion_id, title=title, contents=contents)
             db.session.add(diary_entry)
@@ -90,7 +140,9 @@ def create_diary():
                         "title": diary_entry.title,
                         "contents": diary_entry.contents,
                         "emotion": emotion,
-                        "emotion_id": emotion_id
+                        "emotion_id": emotion_id,
+                        "tags" : tags,
+                        "advice" : advice
                     }
                 }
             }), 201
@@ -216,5 +268,35 @@ def get_emotion_distribution():
 # 차트 페이지 라우트
 @diary_bp.route('/chart', methods=['GET'])
 def weekly_chart():
-    # 차트 표시할 HTML 템플릿 렌더링 (라인 차트 + 바 차트)
-    return render_template('diary_chart.html'), 200
+    # 로그인 정보 없음(Error)
+    if 'user_id' not in session:
+        return jsonify({"code": 401, "body": {"message": "로그인 정보가 없어요"}}), 401
+
+    # 이번 주 월~일 날짜 구하기
+    monday, sunday = get_current_week_range()
+
+    # DB에서 이번 주 해당 기간의 일기 조회
+    diaries_this_week = (
+        db.session.query(Diary, Emotion)
+        .join(Emotion, Emotion.id == Diary.emotion_id)
+        .filter(Diary.user_id == session['user_id'])
+        .filter(Diary.created_at >= monday)
+        .filter(Diary.created_at <= sunday)
+        .all()
+    )
+
+    if not diaries_this_week:
+        return render_template('diary_chart.html', average_score=0)
+
+    # 평균 점수 계산
+    total_score = 0
+    total_entries = len(diaries_this_week)
+    for diary, emotion in diaries_this_week:
+        predicted_label = emotion.id - 1
+        emotion_name = label_decoding[predicted_label]
+        score = emotion_scores.get(emotion_name, 5)
+        total_score += score
+
+    average_score = round(total_score / total_entries, 2)
+
+    return render_template('diary_chart.html', average_score=average_score)
