@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AuthLayout from '../views/Layouts/AuthLayout.jsx'
 import LoginView from '@/views/pages/LoginView.jsx'
 import JoinView from '@/views/pages/JoinView.jsx'
+import MyDiaryView from '@/views/pages/MyDiaryView.jsx'
+import MainLayout from '../views/Layouts/MainLayout.jsx'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +20,17 @@ const router = createRouter({
 				{
 					path: 'join',
 					component: () => JoinView
+				}
+			]
+		},
+		{
+			path: '/diary',
+			component: MainLayout,
+			redirect: '/diary/list',
+			children: [
+				{
+					path: 'list',
+					component: () => MyDiaryView
 				}
 			]
 		}

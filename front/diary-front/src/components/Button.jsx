@@ -21,7 +21,7 @@ export default function Button(props, { slots }) {
 
 	return (
 		<button
-			type="button"
+			type={type}
 			class={`${defaultClass} ${variantStyles[variant]}`}
 			onClick={onClick}>
 			{/* 왼쪽 아이콘 렌더링 */}
