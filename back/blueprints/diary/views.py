@@ -21,7 +21,7 @@ def mock_login():
 
 # 모델 로드
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-MODEL_PATH = os.path.join(ROOT_DIR, "ai_model", "best_model_093")
+MODEL_PATH = os.path.join(ROOT_DIR, "ai_model", "best_model_067")
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model.eval()
@@ -93,6 +93,21 @@ def generate_advice(text):
         return "Today I Feel."
 
 
+# 모든 일기 리스트 반환
+@diary_bp.route('/list', methods=['GET'])
+def get_diary_list():
+    diaries = Diary.query.all()
+    diary_list = [{"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at} for diary in diaries]
+    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200
+
+# 특정 일기 반환 (ID로 조회)
+@diary_bp.route('/<int:diary_id>', methods=['GET'])
+def get_diary_by_id(diary_id):
+    if (diary := Diary.query.get(diary_id)):
+        return jsonify({"code": 200, "body": {"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at}}), 200
+    return jsonify({"code": 404, "body":{"error": {"message":"일기를 찾을 수 없습니다."}}}), 404
+
+
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
 @diary_bp.route('/create', methods=['GET', 'POST'])
@@ -108,11 +123,11 @@ def create_diary():
 
             # 유효성 불일치(Error)
             if not title or not contents:
-                return jsonify({"code": 400, "body": {"message": "제목 또는 내용이 없어요"}}), 400
+                return jsonify({"code": 400, "body": {"error": {"message": "제목 또는 내용이 없어요"}}}), 400
 
             # 로그인 정보 없음(Error)
             if 'user_id' not in session:
-                return jsonify({"code": 401, "body": {"message": "로그인 정보가 없어요"}}), 401
+                return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
 
             # 감정 분석
             emotion = classify_emotion(f"{title} {contents}")
@@ -155,7 +170,7 @@ def create_diary():
         
         except Exception as e:
             # 서버 에러(코드 수정으로 대응할 수 없는 에러)
-            return jsonify({"code": 500, "body": {"message": f"예기치못한 에러가 발생했어요: {str(e)}"}}), 500
+            return jsonify({"code": 500, "body": {"error": {"message": f"예기치못한 에러가 발생했어요: {str(e)}"}}}), 500
 
 
 # 감정 점수
@@ -189,7 +204,7 @@ def get_current_week_range():
 def get_weekly_scores():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"message": "로그인 정보가 없어요"}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
 
     # 이번 주 월~일 날짜 구하기
     monday, sunday = get_current_week_range()
@@ -205,7 +220,7 @@ def get_weekly_scores():
     )
 
     if not diaries_this_week:
-        return jsonify({"code": 400, "body": {"message": "이번 주에 작성한 일기가 없어요"}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "이번 주에 작성한 일기가 없어요"}}}), 400
 
     scores_by_day = {i: [] for i in range(7)}
     counts_by_day = {i: 0 for i in range(7)}  # 요일별 일기 개수
@@ -232,7 +247,7 @@ def get_weekly_scores():
             "count": counts_by_day[i]  # 해당 요일의 일기 개수
         })
 
-    return jsonify({"code": 200, "body": {"message": "이번주 감정 점수", "body": avg_scores}}), 200
+    return jsonify({"code": 200, "body": {"message": "이번주 감정 점수", "data": avg_scores}}), 200
 
 
 # 감정별 비율 API
@@ -240,7 +255,7 @@ def get_weekly_scores():
 def get_emotion_distribution():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"message": "로그인 정보가 없어요"}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
     
     # 감정별 분포 데이터 가져오기
     emotion_counts = (
@@ -252,7 +267,7 @@ def get_emotion_distribution():
     )
     
     if not emotion_counts:
-        return jsonify({"code": 400, "body": {"message": "아직 일기가 없어요"}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "아직 일기가 없어요"}}}), 400
     
     counts_map = {eid: c for eid, c in emotion_counts}
     ordered_emotions = [label_decoding[i] for i in sorted(label_decoding.keys())]
@@ -269,14 +284,14 @@ def get_emotion_distribution():
             "count": count  # 해당 감정의 일기 개수
         })
     
-    return jsonify({"code": 200, "body": {"message": "감정별 분포", "body": distribution}}), 200
+    return jsonify({"code": 200, "body": {"message": "감정별 분포", "data": distribution}}), 200
 
 # 차트 페이지 라우트
 @diary_bp.route('/chart', methods=['GET'])
 def weekly_chart():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"message": "로그인 정보가 없어요"}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
 
     # 이번 주 월~일 날짜 구하기
     monday, sunday = get_current_week_range()
