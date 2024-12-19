@@ -7,7 +7,8 @@ export default function Button(props, { slots }) {
 		onClick = () => {}
 	} = props
 
-	const defaultClass = 'px-5 py-2 rounded-rounded-8 font-gowun-dodum text-base'
+	const defaultClass =
+		'px-5 py-2 rounded-rounded-8 font-gowun-dodum text-base custom-text-base'
 
 	const variantStyles = {
 		primary:
@@ -20,7 +21,7 @@ export default function Button(props, { slots }) {
 
 	return (
 		<button
-			type="button"
+			type={type}
 			class={`${defaultClass} ${variantStyles[variant]}`}
 			onClick={onClick}>
 			{/* 왼쪽 아이콘 렌더링 */}
