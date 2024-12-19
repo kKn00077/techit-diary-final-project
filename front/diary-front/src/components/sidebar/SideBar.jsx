@@ -14,7 +14,7 @@ export default function SideBar() {
 
 			{menus.map((group, index) => {
 				return (
-					<div key={index}>
+					<div key={group.path}>
 						<div class="flex flex-col gap-4">
 							{group.children.map((menu) => {
 								return (
