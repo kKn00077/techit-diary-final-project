@@ -6,7 +6,7 @@ export default function Logo({ type = 1 }) {
 	const containerClass = 'flex flex-col justify-center content-center gap-1'
 
 	// 조건에 따라 텍스트와 스타일을 설정
-	const content = {
+	const LogoNode = {
 		0: (
 			<div class={`${containerClass}`}>
 				<div class={`text-4xl custom-text-4xl text-center ${baseClass}`}>
@@ -48,5 +48,5 @@ export default function Logo({ type = 1 }) {
 	}
 
 	// 조건에 따라 렌더링
-	return content[type] || content.default
+	return LogoNode[type] || LogoNode.default
 }

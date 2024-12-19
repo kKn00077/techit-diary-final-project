@@ -2,7 +2,7 @@ export default function TextBox({ type, placeholder }) {
 	const defaultClass =
 		'bg-Black-black-200 placeholder-Black-black-700 text-Black-black-900 focus:outline-none font-gowun-dodum text-base custom-text-base px-5 focus:border-0'
 
-	const textBox = {
+	const TextBoxNode = {
 		1: (
 			<input
 				type="text"
@@ -20,5 +20,5 @@ export default function TextBox({ type, placeholder }) {
 	}
 
 	// 조건에 따라 렌더링
-	return textBox[type] || textBox.default
+	return TextBoxNode[type] || TextBoxNode.default
 }
