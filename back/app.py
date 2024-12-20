@@ -4,8 +4,10 @@ from login import login_manager
 from blueprints.diary import diary_bp
 from blueprints.auth.views import auth_bp
 from views import setup_routes
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # 모든 도메인에서 모든 요청 허용
 
 # DataBase 연결 URI
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
