@@ -5,6 +5,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime, timedelta
 from openai import OpenAI
+from login import load_user
 
 
 # 블루프린트 정의 (템플릿 폴더 경로 추가)
@@ -96,16 +97,47 @@ def generate_advice(text):
 # 모든 일기 리스트 반환
 @diary_bp.route('/list', methods=['GET'])
 def get_diary_list():
-    
-    # TODO request에서 page 데이터 가져오기
-    
-    # TODO 로그인 한 사용자의 일기만 가져오도록 수정 (login.py의 load_user 함수 활용)
-    diaries = Diary.query.all()
-    
-    # TODO emotion_id(Emotion 모델)를 참조하여 name을 가져오도록 수정 (emotion 객체 활용)
-    # TODO pagination 7개 단위로 나누어서 가져오도록 수정 (LIMIT, OFFSET 활용)
-    diary_list = [{"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at} for diary in diaries]
-    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200 # TODO 오타 수정해 주세요
+    try:
+        # 로그인 확인
+        if 'user_id' not in session:
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+
+        # 페이지 번호 가져오기 (기본값: 1)
+        page = int(request.args.get('page', 1))
+        per_page = 7  # 페이지당 일기 개수
+
+        # 로그인한 사용자의 일기 가져오기
+        user_id = session['user_id']
+        diaries = Diary.query.filter_by(user_id=user_id).paginate(page, per_page, False)
+
+        # 일기 리스트 구성
+        diary_list = [
+            {
+                "id": diary.id,
+                "title": diary.title,
+                "contents": diary.contents,
+                "created_at": diary.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "emotion": diary.emotion.name  # 감정 이름 포함
+            }
+            for diary in diaries.items
+        ]
+
+        return jsonify({
+            "code": 200,
+            "body": {
+                "message": "일기 리스트 반환 성공",
+                "diaries": diary_list,
+                "total": diaries.total,
+                "page": diaries.page,
+                "pages": diaries.pages
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "code": 500,
+            "body": {"error": {"message": "일기 리스트 반환 중 오류가 발생했습니다", "detail": f"{str(e)}"}}
+        }), 500
 
 # 특정 일기 반환 (ID로 조회)
 @diary_bp.route('/<int:diary_id>', methods=['GET'])
