@@ -30,12 +30,12 @@ export default function EmogiLabel({ id, direction = 'col' }) {
 		row: {
 			wrap: 'flex-row py-[10px] px-[10px] gap-2',
 			icon_size: 'size-8',
-			text_size: 'text-lg custom-text-lg'
+			text_size: 'text-lg custom-text-lg font-gowun-batang'
 		},
 		col: {
 			wrap: 'flex-col py-2 px-2',
 			icon_size: 'size-14',
-			text_size: 'text-sm custom-text-sm'
+			text_size: 'text-sm custom-text-sm font-gowun-dodum'
 		}
 	}
 
@@ -44,8 +44,7 @@ export default function EmogiLabel({ id, direction = 'col' }) {
 	return (
 		<div class={`${emogiClass.default_wrap} ${emogiClass[direction].wrap}`}>
 			<Emogi class={emogiClass[direction].icon_size} />
-			<span
-				class={`font-gowun-dodum ${emogiClass[direction].text_size} text-Black-black-1100`}>
+			<span class={`${emogiClass[direction].text_size} text-Black-black-1100`}>
 				{label}
 			</span>
 		</div>

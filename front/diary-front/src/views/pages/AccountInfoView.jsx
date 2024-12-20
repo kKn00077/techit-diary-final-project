@@ -57,12 +57,6 @@ export default function AccountInfoView() {
 					<Button rightIcon={DeleteLabel}>계정 탈퇴</Button>
 				</CardHeader>
 			</Card>
-			{/* <div class="flex flex-row gap-3 justify-end">
-				<Button leftIcon={Minus}>삭제</Button>
-				<Button variant="secondary" leftIcon={Archive}>
-					일기 목록
-				</Button>
-			</div> */}
 		</div>
 	)
 }
