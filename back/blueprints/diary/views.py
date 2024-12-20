@@ -107,7 +107,31 @@ def get_diary_by_id(diary_id):
         return jsonify({"code": 200, "body": {"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at}}), 200
     return jsonify({"code": 404, "body":{"error": {"message":"일기를 찾을 수 없습니다."}}}), 404
 
+# 일기 상세 조회
+@diary_bp.route('/post/detail/<int:post_id>')
+def detail_post(post_id):
+    try:
+        # 게시물 조회
+        post = Posts.query.filter(Posts.id == post_id).first()
 
+        # 게시물이 없는 경우 404 처리
+        if not post:
+            return jsonify({"error": "Post not found"}), 404
+
+        # id, 제목, 내용, 작성날짜, 감정
+        context = {
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "post_date": post.post_date,
+            "emotion": post.emotion  
+        }
+
+        return jsonify(context), 200
+    except Exception as e:
+        # 예외 처리
+        return jsonify({"error": str(e)}), 400
+    
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
 @diary_bp.route('/create', methods=['GET', 'POST'])

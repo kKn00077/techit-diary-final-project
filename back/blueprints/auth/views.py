@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash
-from models import db, User
+from models import db, User, Users
+from flask_login import login_user
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -36,3 +38,28 @@ def signup():
     except Exception as e:
         db.session.rollback()
         return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
+
+# 로그인
+@auth_bp.route('/auth/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        error_code = request.args.get('error_code')  
+        error_message = None
+
+        if error_code == '400':  
+            error_message = "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."
+
+        return render_template('login.html', error_message=error_message)
+    else:
+        email = request.form['email']
+        password = request.form['password']
+
+        user = Users.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            session['user_name'] = user.email
+            session['user_id'] = user.id
+            return redirect(url_for('home', error_code=200))
+        else:
+            return redirect(url_for('login', error_code=400))
