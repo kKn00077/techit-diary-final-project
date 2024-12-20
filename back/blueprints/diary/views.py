@@ -121,39 +121,23 @@ def detail_diary(diary_id):
         # 게시물 조회
         post = Diary.query.filter(diary_id == diary_id).first()
 
-        # 게시물이 없는 경우 400 
+        # 게시물이 없는 경우 400
         if not post:
-<<<<<<< HEAD
-             return jsonify({"code": 400, "body": {"error": {"message": "게시물을 찾을 수가 없어요."}}}), 400
-=======
-            return jsonify({"error": "Post not found"}), 404 # TODO JSON 형식 맞춰주세요
->>>>>>> bd1acf2d6bc626e96132e26549bd465f41133d1b
+             return jsonify({"code": 400, "body": {"error": {"message": "게시글을 찾지 못했어요"}}}), 400
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
             "id": Diary.id,
             "title": Diary.title,
-<<<<<<< HEAD
             "contents": Diary.contents,
             "created_at": Diary.created_at,
-            "emotion_id": Diary.emotion_id   # TODO 요거는 한번 테스트 해보세요
+            "emotion_id": Diary.emotion_id  
         }
 
-        return jsonify({"code": 200, "body": {"error": {"message": "게시물 조회가 완료되었어요."}}}), 200
+        return jsonify({"code": 200, "body": {"error": {"message": "게시글 조회에 성공했어요"}}}), 200
     except Exception as e:
         # 예외 처리
-        return jsonify({"code": 400, "body": {"error": {"message": "예기치못한 에러가 발생했어요."}}}), 400
-=======
-            "content": Diary.contents,
-            "post_date": Diary.created_at,
-            "emotion": Diary.emotion   # TODO 요거는 한번 테스트 해보세요
-        }
-
-        return jsonify(context), 200 # TODO JSON 형식 맞춰주세요
-    except Exception as e:
-        # 예외 처리
-        return jsonify({"error": str(e)}), 400 # TODO JSON 형식 맞춰주세요
->>>>>>> bd1acf2d6bc626e96132e26549bd465f41133d1b
+        return jsonify({"code": 400, "body": {"error": {"message": "예기치못한 에러가 발생했어요"}}}), 400
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
