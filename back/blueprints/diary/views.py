@@ -116,21 +116,21 @@ def detail_diary(diary_id):
 
         # 게시물이 없는 경우 404 처리
         if not post:
-            return jsonify({"error": "Post not found"}), 404
+            return jsonify({"error": "Post not found"}), 404 # TODO JSON 형식 맞춰주세요
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
             "id": Diary.id,
             "title": Diary.title,
-            "content": Diary.content,
-            "post_date": Diary.post_date,
-            "emotion": Diary.emotion  
+            "content": Diary.contents,
+            "post_date": Diary.created_at,
+            "emotion": Diary.emotion   # TODO 요거는 한번 테스트 해보세요
         }
 
-        return jsonify(context), 200
+        return jsonify(context), 200 # TODO JSON 형식 맞춰주세요
     except Exception as e:
         # 예외 처리
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 400 # TODO JSON 형식 맞춰주세요
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리

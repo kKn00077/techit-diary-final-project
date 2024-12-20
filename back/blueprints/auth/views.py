@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash
-from models import db, User, Users
+from models import db, User
 from flask_login import login_user
 
 
@@ -58,12 +58,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        user = Users.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
             login_user(user)
-            session['user_name'] = user.email
+            session['user_name'] = user.email # TODO session에 user_name을 user_email로 저장
             session['user_id'] = user.id
-            return redirect(url_for('home', error_code=200))
+            
+            # TODO Json Response로 변경해주세요.
+            return redirect(url_for('home', error_code=200))  # TODO JSON 형식 맞춰주세요
         else:
-            return redirect(url_for('login', error_code=400))
+            # TODO Json Response로 변경해주세요.
+            return redirect(url_for('login', error_code=400))  # TODO JSON 형식 맞춰주세요
