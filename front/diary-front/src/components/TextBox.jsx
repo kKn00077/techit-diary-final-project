@@ -1,4 +1,6 @@
-export default function TextBox({ type, placeholder }) {
+export default function TextBox(props) {
+	const { type = 0, placeholder = '' } = props
+
 	const defaultClass =
 		'bg-Black-black-200 placeholder-Black-black-700 text-Black-black-900 focus:outline-none font-gowun-dodum text-base custom-text-base px-5 focus:border-0'
 
@@ -9,6 +11,11 @@ export default function TextBox({ type, placeholder }) {
 				class={`border-0 border-b  border-b-Purple-purple-200 focus:border-0 focus:border-b focus:border-b-Purple-purple-500 py-2 ${defaultClass}`}
 				placeholder={placeholder}
 			/>
+		),
+		2: (
+			<textarea
+				class={`border border-Purple-purple-200 focus:border-2 focus:border-Purple-purple-400 rounded-rounded-7 py-3 ${defaultClass}`}
+				placeholder={placeholder}></textarea>
 		),
 		default: (
 			<input

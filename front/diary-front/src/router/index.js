@@ -10,6 +10,7 @@ import Book from '@/assets/icon/filled/book.svg'
 import User from '@/assets/icon/filled/user.svg'
 import CloseRec from '@/assets/icon/filled/close-rectangle.svg'
 import AccountInfoView from '@/views/pages/AccountInfoView.jsx'
+import WriteView from '@/views/pages/WriteView.jsx'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,7 +44,7 @@ const router = createRouter({
 				},
 				{
 					path: 'write',
-					component: () => MyDiaryView,
+					component: () => WriteView,
 					meta: { title: '일기 쓰기', icon: Marker }
 				}
 			]
