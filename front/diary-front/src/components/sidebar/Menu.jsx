@@ -11,7 +11,9 @@ export default function Menu(props, { slots }) {
 
 	// 현재 URL과 일치하는지 확인
 	const route = useRoute()
-	const isActive = route.path === URL
+	const isActive =
+		(URL == '/diary/list' && route.path.includes('/diary/detail')) ||
+		route.path === URL
 
 	return (
 		<RouterLink

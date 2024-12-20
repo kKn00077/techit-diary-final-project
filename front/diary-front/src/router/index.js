@@ -11,6 +11,7 @@ import User from '@/assets/icon/filled/user.svg'
 import CloseRec from '@/assets/icon/filled/close-rectangle.svg'
 import AccountInfoView from '@/views/pages/AccountInfoView.jsx'
 import WriteView from '@/views/pages/WriteView.jsx'
+import DetailView from '@/views/pages/DetailView.jsx'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,12 +41,17 @@ const router = createRouter({
 				{
 					path: 'list',
 					component: () => MyDiaryView,
-					meta: { title: '내 일기', icon: Book }
+					meta: { is_show: true, title: '내 일기', icon: Book }
 				},
 				{
 					path: 'write',
 					component: () => WriteView,
-					meta: { title: '일기 쓰기', icon: Marker }
+					meta: { is_show: true, title: '일기 쓰기', icon: Marker }
+				},
+				{
+					path: 'detail/:id',
+					component: () => DetailView,
+					meta: { is_show: false, title: '내 일기', icon: Book }
 				}
 			]
 		},
@@ -56,11 +62,11 @@ const router = createRouter({
 				{
 					path: 'info',
 					component: () => AccountInfoView,
-					meta: { title: '내 정보', icon: User }
+					meta: { is_show: true, title: '내 정보', icon: User }
 				},
 				{
 					path: 'logout',
-					meta: { title: '로그아웃', icon: CloseRec }
+					meta: { is_show: true, title: '로그아웃', icon: CloseRec }
 				}
 			]
 		}

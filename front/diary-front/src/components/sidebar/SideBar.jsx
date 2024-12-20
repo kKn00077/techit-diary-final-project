@@ -17,17 +17,21 @@ export default function SideBar() {
 					<div key={group.path}>
 						<div class="flex flex-col gap-4">
 							{group.children.map((menu) => {
-								return (
-									<Menu
-										url={group.path + '/' + menu.path}
-										leftIcon={menu.meta.icon}
-										key={menu.path}>
-										{menu.meta.title}
-									</Menu>
-								)
+								if (menu.meta.is_show) {
+									return (
+										<Menu
+											url={group.path + '/' + menu.path}
+											leftIcon={menu.meta.icon}
+											key={menu.path}>
+											{menu.meta.title}
+										</Menu>
+									)
+								}
 							})}
 						</div>
-						{index < menus.length - 1 && <hr class="border-purple-300 mt-6" />}
+						{index < menus.length - 1 && (
+							<hr class="border-Purple-purple-100 mt-6" />
+						)}
 					</div>
 				)
 			})}
