@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>
+        {% block pageheader %}
+
+        {% endblock %}
+    </h1>
+
+    <h5>
+        {% if session['user_name'] %}
+        현재 로그인한 사용자 : {{ session['user_name'] }}<br>
+        <a href="{{ url_for('logout') }}">로그아웃</a>
+        {% endif %}
+    </h5>    
+
+    {% block pagecontent %}
+
+    {% endblock %}
+</body>
+</html>
