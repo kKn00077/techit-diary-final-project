@@ -1,24 +1,12 @@
-<<<<<<< HEAD
-from flask import Blueprint, request, jsonify, render_template
-=======
 from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
->>>>>>> d022715e4c1ff22a4978f76d536e1d2061068130
 from werkzeug.security import generate_password_hash
-from models import db, User
+from models import db, User, Users
 from flask_login import login_user
 
 
-auth_bp = Blueprint('auth', __name__, 
-                    template_folder='templates')
+auth_bp = Blueprint('auth', __name__)
 
 # 회원가입 API
-@auth_bp.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'GET':
-        # GET 요청 시 회원가입 폼 렌더링
-        return render_template('signup.html')
-
-<<<<<<< HEAD
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
     try:
@@ -27,6 +15,8 @@ def signup():
         password = request.json.get('password')
         password_confirm = request.json.get('password_confirm')
 
+        # TODO password Confirm 필드 추가하시고 하단 if문에 추가해주세요.
+
         # 필수 데이터 확인
         if not email or not password:
             return jsonify({"code":400, "body":{"error": {"message": "모든 필드를 입력해야 합니다."}}}), 400
@@ -34,26 +24,21 @@ def signup():
         if password != password_confirm:
             return jsonify({"code": 400, "body": {"error": {"message": "비밀번호가 일치하지 않습니다."}}}), 400
 
-            # 이미 존재하는 사용자 확인
-            existing_user = User.query.filter(User.email == email).first()
-            if existing_user:
-                return jsonify({"code": 409, "body": {"error": {"message": "이미 존재하는 사용자입니다."}}}), 409
+        # 이미 존재하는 사용자 확인
+        existing_user = User.query.filter(User.email == email).first()
+        if existing_user:
+            return jsonify({"code":409, "body":{"error": {"message": "이미 존재하는 사용자입니다."}}}), 409
 
-            # 새로운 사용자 생성
-            new_user = User(
-                email=email,
-                password=generate_password_hash(password)
-            )
-            db.session.add(new_user)
-            db.session.commit()
+        # 새로운 사용자 생성
+        new_user = User(
+            email=email,
+            password=generate_password_hash(password)
+        )
+        db.session.add(new_user)
+        db.session.commit()
 
-            return jsonify({"code": 201, "body": {"message": "회원가입이 성공적으로 완료되었습니다."}}), 201
+        return jsonify({"code":201, "body":{"message": "회원가입이 성공적으로 완료되었습니다."}}), 201
 
-<<<<<<< HEAD
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"code": 500, "body": {"error": {"message": "회원가입 중 오류가 발생했습니다", "detail": f"{str(e)}"}}}), 500
-=======
     except Exception as e:
         db.session.rollback()
         return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
@@ -73,16 +58,12 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        user = User.query.filter_by(email=email).first()
+        user = Users.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
             login_user(user)
-            session['user_name'] = user.email # TODO session에 user_name을 user_email로 저장
+            session['user_name'] = user.email
             session['user_id'] = user.id
-            
-            # TODO Json Response로 변경해주세요.
-            return redirect(url_for('home', error_code=200))  # TODO JSON 형식 맞춰주세요
+            return redirect(url_for('home', error_code=200))
         else:
-            # TODO Json Response로 변경해주세요.
-            return redirect(url_for('login', error_code=400))  # TODO JSON 형식 맞춰주세요
->>>>>>> d022715e4c1ff22a4978f76d536e1d2061068130
+            return redirect(url_for('login', error_code=400))
