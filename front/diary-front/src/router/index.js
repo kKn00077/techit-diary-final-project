@@ -9,6 +9,7 @@ import Marker from '@/assets/icon/filled/marker.svg'
 import Book from '@/assets/icon/filled/book.svg'
 import User from '@/assets/icon/filled/user.svg'
 import CloseRec from '@/assets/icon/filled/close-rectangle.svg'
+import AccountInfoView from '@/views/pages/AccountInfoView.jsx'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,7 +54,7 @@ const router = createRouter({
 			children: [
 				{
 					path: 'info',
-					component: () => MyDiaryView,
+					component: () => AccountInfoView,
 					meta: { title: '내 정보', icon: User }
 				},
 				{
