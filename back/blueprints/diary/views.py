@@ -96,9 +96,16 @@ def generate_advice(text):
 # 모든 일기 리스트 반환
 @diary_bp.route('/list', methods=['GET'])
 def get_diary_list():
+    
+    # TODO request에서 page 데이터 가져오기
+    
+    # TODO 로그인 한 사용자의 일기만 가져오도록 수정 (login.py의 load_user 함수 활용)
     diaries = Diary.query.all()
+    
+    # TODO emotion_id(Emotion 모델)를 참조하여 name을 가져오도록 수정 (emotion 객체 활용)
+    # TODO pagination 7개 단위로 나누어서 가져오도록 수정 (LIMIT, OFFSET 활용)
     diary_list = [{"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at} for diary in diaries]
-    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200
+    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200 # TODO 오타 수정해 주세요
 
 # 특정 일기 반환 (ID로 조회)
 @diary_bp.route('/<int:diary_id>', methods=['GET'])

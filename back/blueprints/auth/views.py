@@ -15,8 +15,6 @@ def signup():
         password = request.json.get('password')
         password_confirm = request.json.get('password_confirm')
 
-        # TODO password Confirm 필드 추가하시고 하단 if문에 추가해주세요.
-
         # 필수 데이터 확인
         if not email or not password:
             return jsonify({"code":400, "body":{"error": {"message": "모든 필드를 입력해야 합니다."}}}), 400
