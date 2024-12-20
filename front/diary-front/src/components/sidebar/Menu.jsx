@@ -17,7 +17,7 @@ export default function Menu(props, { slots }) {
 		<RouterLink
 			to={URL}
 			class={`flex flex-row gap-2 px-3 py-2 rounded-rounded-3 font-gowun-batang 
-             text-Black-black-1100 cursor-pointer 
+             text-Black-black-1100 cursor-pointer custom-text-base text-base
             ${isActive ? 'bg-Purple-purple-100' : 'hover:bg-Black-black-400'}`} // 조건부 스타일 추가
 			onClick={onClick}>
 			{LeftIcon && <LeftIcon class={`${iconSize} fill-Black-black-1000`} />}

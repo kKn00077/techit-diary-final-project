@@ -34,6 +34,23 @@ export default function Logo({ type = 1 }) {
 				</div>
 			</div>
 		),
+		3: (
+			<div class="flex flex-col">
+				<div class="flex flex-row gap-2 text-Purple-purple-500">
+					<div class="text-md custom-text-md content-end font-gowun-batang font-bold">
+						today
+					</div>
+					<div class="text-lg custom-text-lg font-gowun-batang font-bold">
+						I Feel
+					</div>
+				</div>
+				<div class="text-xs custom-text-xs font-gowun-dodum text-Black-black-1100">
+					일상을 기록하고
+					<br />
+					나를 알아가는 소중한 시간
+				</div>
+			</div>
+		),
 		default: (
 			<div class={`${containerClass}`}>
 				<div class="flex flex-row gap-2 items-end leading-none text-Purple-purple-500 font-gowun-batang font-bold">

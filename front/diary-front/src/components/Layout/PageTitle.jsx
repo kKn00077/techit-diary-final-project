@@ -13,7 +13,7 @@ export default function PageTitle(props, { slots }) {
 	return (
 		<header class="flex flex-row gap-2 items-center">
 			{LeftIcon && <LeftIcon class={`${iconSize} fill-Black-black-1000`} />}
-			<h1 class="text-2xl inline text-Black-black-1000 font-gowun-batang">
+			<h1 class="text-2xl custom-text-2xl inline text-Black-black-1000 font-gowun-batang">
 				{title || 'Page Header'}
 			</h1>
 		</header>
