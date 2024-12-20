@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
 from werkzeug.security import generate_password_hash
-from models import db, User, Users
+from models import db, User
 from flask_login import login_user
 
 
@@ -14,8 +14,6 @@ def signup():
         email = request.json.get('email')
         password = request.json.get('password')
         password_confirm = request.json.get('password_confirm')
-
-        # TODO password Confirm 필드 추가하시고 하단 if문에 추가해주세요.
 
         # 필수 데이터 확인
         if not email or not password:
@@ -47,23 +45,27 @@ def signup():
 @auth_bp.route('/auth/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        error_code = request.args.get('error_code')  
+        error_code = request.args.get('error_code')
         error_message = None
+    
+    if error_code == '400':
+            return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
 
-        if error_code == '400':  
-            error_message = "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."
+    else:  # POST 요청 처리
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-        return render_template('login.html', error_message=error_message)
-    else:
-        email = request.form['email']
-        password = request.form['password']
+        # 사용자 조회
+        user = User.query.filter_by(email=email).first()
 
-        user = Users.query.filter_by(email=email).first()
-
-        if user and user.check_password(password):
+        if user and user.check_password(password):  
             login_user(user)
-            session['user_name'] = user.email
+            session['user_email'] = user.email  
             session['user_id'] = user.id
-            return redirect(url_for('home', error_code=200))
-        else:
-            return redirect(url_for('login', error_code=400))
+
+            # 성공 응답
+            return jsonify({"code": 200, "body": {"error": {"message": "로그인이 성공적으로 완료되었습니다."}}}), 200
+
+        else:  
+            # 실패 응답
+            return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400

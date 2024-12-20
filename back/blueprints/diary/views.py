@@ -96,9 +96,16 @@ def generate_advice(text):
 # 모든 일기 리스트 반환
 @diary_bp.route('/list', methods=['GET'])
 def get_diary_list():
+    
+    # TODO request에서 page 데이터 가져오기
+    
+    # TODO 로그인 한 사용자의 일기만 가져오도록 수정 (login.py의 load_user 함수 활용)
     diaries = Diary.query.all()
+    
+    # TODO emotion_id(Emotion 모델)를 참조하여 name을 가져오도록 수정 (emotion 객체 활용)
+    # TODO pagination 7개 단위로 나누어서 가져오도록 수정 (LIMIT, OFFSET 활용)
     diary_list = [{"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at} for diary in diaries]
-    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200
+    return jsonify({"code": 200, "boay":{"diaries": diary_list}}), 200 # TODO 오타 수정해 주세요
 
 # 특정 일기 반환 (ID로 조회)
 @diary_bp.route('/<int:diary_id>', methods=['GET'])
@@ -114,23 +121,23 @@ def detail_diary(diary_id):
         # 게시물 조회
         post = Diary.query.filter(diary_id == diary_id).first()
 
-        # 게시물이 없는 경우 404 처리
+        # 게시물이 없는 경우 400 
         if not post:
-            return jsonify({"error": "Post not found"}), 404
+             return jsonify({"code": 400, "body": {"error": {"message": "게시물을 찾을 수가 없어요."}}}), 400
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
             "id": Diary.id,
             "title": Diary.title,
-            "content": Diary.content,
-            "post_date": Diary.post_date,
-            "emotion": Diary.emotion  
+            "contents": Diary.contents,
+            "created_at": Diary.created_at,
+            "emotion_id": Diary.emotion_id   # TODO 요거는 한번 테스트 해보세요
         }
 
-        return jsonify(context), 200
+        return jsonify({"code": 200, "body": {"error": {"message": "게시물 조회가 완료되었어요."}}}), 200
     except Exception as e:
         # 예외 처리
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "예기치못한 에러가 발생했어요."}}}), 400
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
