@@ -21,7 +21,7 @@ def mock_login():
 
 # 모델 로드
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-MODEL_PATH = os.path.join(ROOT_DIR, "ai_model", "best_model_067")
+MODEL_PATH = os.path.join(ROOT_DIR, "ai_model", "best_model_093")
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH)
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model.eval()
