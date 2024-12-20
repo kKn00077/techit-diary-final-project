@@ -345,3 +345,31 @@ def weekly_chart():
     average_score = round(total_score / total_entries, 2)
 
     return render_template('diary_chart.html', average_score=average_score)
+
+# 일기 삭제 API
+@diary_bp.route('/delete/<int:diary_id>', methods=['DELETE'])
+def delete_diary(diary_id):
+    try:
+        # 로그인 정보 확인
+        if 'user_id' not in session:
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+
+        # 데이터베이스에서 해당 ID의 일기 조회
+        diary = Diary.query.get(diary_id)
+
+        # 일기가 존재하지 않을 경우
+        if not diary:
+            return jsonify({"code": 400, "body": {"error": {"message": "삭제할 일기를 찾을 수 없습니다."}}}), 400
+
+        # 삭제 권한 확인 (로그인한 사용자의 일기인지 확인)
+        if diary.user_id != session['user_id']:
+            return jsonify({"code": 401, "body": {"error": {"message": "삭제 권한이 없습니다."}}}), 401
+
+        # 일기 삭제
+        db.session.delete(diary)
+        db.session.commit()
+        return jsonify({"code": 200, "body": {"message": "일기가 성공적으로 삭제되었습니다."}}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"code": 500, "body": {"error": {"message": "일기 삭제 중 오류가 발생했습니다", "detail": f"{str(e)}"}}}), 500
