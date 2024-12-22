@@ -7,7 +7,7 @@ from views import setup_routes
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서 모든 요청 허용
+CORS(app, supports_credentials=True)  # 모든 도메인에서 모든 요청 허용
 
 # DataBase 연결 URI
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_string

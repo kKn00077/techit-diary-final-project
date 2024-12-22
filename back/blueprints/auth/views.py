@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session, render_template, redirect, url_for
+from flask import Blueprint, request, jsonify, session, make_response
 from werkzeug.security import generate_password_hash
 from models import db, User
 from flask_login import login_user
@@ -54,9 +54,8 @@ def login():
         login_user(user)
         session['email'] = user.email  
         session['user_id'] = user.id
-
-        # 성공 응답
-        return jsonify({"code": 200, "body": {"message": "로그인이 성공적으로 완료되었습니다."}}), 200
+        
+        return jsonify({"code": 200, "body": {"message": "로그인이 성공적으로 완료되었습니다."}})
 
     else:  
         # 실패 응답
