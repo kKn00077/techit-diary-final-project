@@ -42,30 +42,22 @@ def signup():
         return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
 
 # 로그인
-@auth_bp.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET'])
 def login():
-    if request.method == 'GET':
-        error_code = request.args.get('error_code')
-        error_message = None
-    
-    if error_code == '400':
-            return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
+    email = request.json.get('email')
+    password = request.json.get('password')
 
-    else:  # POST 요청 처리
-        email = request.form.get('email')
-        password = request.form.get('password')
+    # 사용자 조회
+    user = User.query.filter_by(email=email).first()
 
-        # 사용자 조회
-        user = User.query.filter_by(email=email).first()
+    if user and user.check_password(password):  
+        login_user(user)
+        session['email'] = user.email  
+        session['user_id'] = user.id
 
-        if user and user.check_password(password):  
-            login_user(user)
-            session['user_email'] = user.email  
-            session['user_id'] = user.id
+        # 성공 응답
+        return jsonify({"code": 200, "body": {"error": {"message": "로그인이 성공적으로 완료되었습니다."}}}), 200
 
-            # 성공 응답
-            return jsonify({"code": 200, "body": {"error": {"message": "로그인이 성공적으로 완료되었습니다."}}}), 200
-
-        else:  
-            # 실패 응답
-            return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
+    else:  
+        # 실패 응답
+        return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
