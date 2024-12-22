@@ -8,7 +8,7 @@ export default function Button(props, { slots }) {
 	} = props
 
 	const defaultClass =
-		'inline-flex gap-2 px-5 py-2 rounded-rounded-8 font-gowun-dodum text-base custom-text-base items-center'
+		'inline-flex justify-center gap-2 px-5 py-2 rounded-rounded-8 font-gowun-dodum text-base custom-text-base items-center'
 
 	const variantStyles = {
 		primary:
