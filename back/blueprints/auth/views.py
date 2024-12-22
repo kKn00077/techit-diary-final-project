@@ -56,7 +56,7 @@ def login():
         session['user_id'] = user.id
 
         # 성공 응답
-        return jsonify({"code": 200, "body": {"error": {"message": "로그인이 성공적으로 완료되었습니다."}}}), 200
+        return jsonify({"code": 200, "body": {"message": "로그인이 성공적으로 완료되었습니다."}}), 200
 
     else:  
         # 실패 응답
