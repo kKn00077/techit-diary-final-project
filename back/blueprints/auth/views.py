@@ -42,7 +42,7 @@ def signup():
         return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
 
 # 로그인
-@auth_bp.route('/login', methods=['GET'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     email = request.json.get('email')
     password = request.json.get('password')
