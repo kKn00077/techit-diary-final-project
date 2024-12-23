@@ -103,7 +103,7 @@ def get_diary_list():
             return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
 
         # 페이지 번호 가져오기 (기본값: 1)
-        page = int(request.args.get('page', 1))
+        page = int(request.json.get('page', 1))
         per_page = 7  # 페이지당 일기 개수
 
         # 로그인한 사용자의 일기 가져오기
