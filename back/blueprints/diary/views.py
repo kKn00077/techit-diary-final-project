@@ -180,9 +180,9 @@ def create_diary():
 
     elif request.method == 'POST':
         try:
-            # 제목과 내용을 폼 데이터에서 가져옴
-            title = request.form.get('title', '').strip()
-            contents = request.form.get('contents', '').strip()
+            # 제목과 내용을 JSON 데이터로 받기
+            title = request.json.get('title', '').strip()
+            contents = request.json.get('contents', '').strip()
 
             # 유효성 불일치(Error)
             if not title or not contents:
