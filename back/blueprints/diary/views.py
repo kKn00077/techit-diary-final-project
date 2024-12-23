@@ -123,15 +123,19 @@ def get_diary_list():
         ]
 
         return jsonify({
-            "code": 200,
-            "body": {
-                "message": "일기 리스트 반환 성공",
-                "diaries": diary_list,
-                "total": diaries.total,
-                "page": diaries.page,
-                "pages": diaries.pages
+    "code": 200,
+    "body": {
+        "message": "일기 리스트 반환 성공",
+        "data": {
+            "diaries": diary_list,
+            "pagination": {
+                "total": diaries.total,  # 전체 일기 수
+                "page": diaries.page,  # 현재 페이지
+                "pages": diaries.pages  # 전체 페이지 수
             }
-        }), 200
+        }
+    }
+}), 200
 
     except Exception as e:
         return jsonify({
@@ -151,28 +155,25 @@ def get_diary_by_id(diary_id):
 def detail_diary(diary_id):
     try:
         # 게시물 조회
-        diary = Diary.query.filter(diary_id == diary_id).first()
+        post = Diary.query.filter(diary_id == diary_id).first()
 
         # 게시물이 없는 경우 400
-        if not diary:
+        if not post:
              return jsonify({"code": 400, "body": {"error": {"message": "게시글을 찾지 못했어요"}}}), 400
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
-            "id": diary.id,
-            "title": diary.title,
-            "contents": diary.contents,
-            "created_at": diary.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "emotion": diary.emotion.name,
-            "tags": diary.tags.split(" "),
-            "advice": diary.advice
+            "id": Diary.id,
+            "title": Diary.title,
+            "contents": Diary.contents,
+            "created_at": Diary.created_at,
+            "emotion_id": Diary.emotion_id  
         }
 
-        return jsonify({"code": 200, "body": {"message": "게시글 조회에 성공했어요", "diary" : context}}), 200
+        return jsonify({"code": 200, "body": {"error": {"message": "게시글 조회에 성공했어요"}}}), 200
     except Exception as e:
-        print(e)
         # 예외 처리
-        return jsonify({"code": 500, "body": {"error": {"message": "예기치 못한 에러가 발생했어요"}}}), 500
+        return jsonify({"code": 400, "body": {"error": {"message": "예기치못한 에러가 발생했어요"}}}), 400
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
@@ -255,20 +256,15 @@ emotion_scores = {
 }
 
 def get_current_week_range():
-    # 오늘 날짜 (시간제외하고 일자만 가져오기)
-    today_date = datetime.now().date()
+    # 오늘 날짜
+    today = datetime.now()
     # 오늘이 몇 번째 요일인지(월요일=0, 일요일=6)
-    weekday = today_date.weekday()
+    weekday = today.weekday()
     # 이번주의 월요일 날짜 계산
-    monday_date = today_date - timedelta(days=weekday)
+    monday = today - timedelta(days=weekday)
     # 이번주의 일요일 날짜 계산 (월요일 + 6일)
-    sunday_date = monday_date + timedelta(days=6)
-    
-    # 각각의 날짜를 "시각"까지 포함한 datetime으로 만들기
-    monday_start = datetime.combine(monday_date, datetime.min.time())   # 월요일 00:00:00
-    sunday_end = datetime.combine(sunday_date, datetime.max.time())    # 일요일 23:59:59.999999
-
-    return monday_start, sunday_end
+    sunday = monday + timedelta(days=6)
+    return monday, sunday
 
 # 주간 평균 감정 점수 API
 @diary_bp.route('/score', methods=['GET'])
@@ -281,7 +277,6 @@ def get_weekly_scores():
     monday, sunday = get_current_week_range()
     
     # DB에서 이번 주 해당 기간의 일기 조회
-    # 현재 DB/Diary의 created_at, updated_at은 UTC 시간이므로, 한국 시간(KST)으로 변경해야 함
     diaries_this_week = (
         db.session.query(Diary, Emotion)
         .join(Emotion, Emotion.id == Diary.emotion_id)
