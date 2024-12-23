@@ -39,7 +39,7 @@ export default function EmogiLabel({ id, direction = 'col' }) {
 		}
 	}
 
-	const { Emogi, label } = emogiList[id]
+	const { Emogi, label } = { ...emogiList[id] }
 
 	return (
 		<div class={`${emogiClass.default_wrap} ${emogiClass[direction].wrap}`}>

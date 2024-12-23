@@ -161,7 +161,7 @@ def detail_diary(diary_id):
         context = {
             "id": diary.id,
             "title": diary.title,
-            "contents": diary.contents,
+            "contents": diary.contents.replace('\n', '<br>'),
             "created_at": diary.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "emotion": diary.emotion.name,
             "tags": diary.tags.split(" "),
