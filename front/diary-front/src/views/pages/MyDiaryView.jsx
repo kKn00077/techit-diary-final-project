@@ -45,6 +45,26 @@ export default defineComponent(() => {
 		}
 	}
 
+	const deleteDiary = async (id) => {
+		try {
+			// TODO: URL Change
+			const response = await api.delete(
+				`http://localhost:5000/diary/delete/${id}`
+			)
+
+			alert(response.data.body.message)
+
+			// 데이터 다시 로드
+			loadData()
+		} catch (error) {
+			errorMessage.value =
+				error.response?.data?.body?.error?.message ||
+				'일기 삭제에 실패했어요! 나중에 다시 시도해주세요! T.T'
+			console.log(error)
+			alert(errorMessage.value)
+		}
+	}
+
 	// 컴포넌트 마운트 시 데이터 로드
 	onMounted(() => {
 		loadData()
@@ -65,7 +85,20 @@ export default defineComponent(() => {
 								<div class="font-gowun-batang font-bold">
 									{formatDate(diary.created_at)}
 								</div>
-								<Minus class="size-4 fill-Black-black-1000 cursor-pointer" />
+								<Minus
+									class="size-4 fill-Black-black-1000 cursor-pointer"
+									onClick={(event) => {
+										event.preventDefault() // LouterLink 클릭 이벤트 방지
+
+										if (
+											confirm(
+												'정말로 삭제하시겠어요? 한번 삭제하면 복구할 수 없어요!'
+											)
+										) {
+											deleteDiary(diary.id)
+										}
+									}}
+								/>
 							</CardHeader>
 							<CardContents className="h-full">
 								<EmogiLabel id={diary.emotion} direction="col" />
