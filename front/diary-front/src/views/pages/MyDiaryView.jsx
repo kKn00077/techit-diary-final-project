@@ -8,8 +8,24 @@ import Button from '@/components/Button'
 import LeftArrow from '@/assets/icon/outline/left-arrow.svg'
 import RightArrow from '@/assets/icon/outline/right-arrow.svg'
 import { RouterLink } from 'vue-router'
+import { ref } from 'vue'
 
 export default function MyDiaryView() {
+	// 상태 정의
+	const diaryList = ref('')
+
+	const loadData = async () => {
+		try {
+			// TODO: URL Change
+			const response = await api.get('http://localhost:5000/airy/list', {})
+		} catch (error) {
+			errorMessage.value =
+				error.response?.data?.body?.error?.message ||
+				'일기 정보를 가져오는데 실패했어요! 새로고침 후 다시 접속해주세요! T.T'
+			alert(errorMessage.value)
+		}
+	}
+
 	return (
 		<div class="flex flex-col gap-10">
 			<div class="flex flex-row flex-wrap gap-6 mx-auto">

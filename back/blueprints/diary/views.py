@@ -14,11 +14,11 @@ diary_bp = Blueprint('diary', __name__,
                     static_folder='static',
                     static_url_path='/static')
 
-@diary_bp.before_request
-def mock_login():
-    # 테스트용 로그인 상태 설정
-    session['user_id'] = 1
-    session['email'] = "test@test.com"
+# @diary_bp.before_request
+# def mock_login():
+#     # 테스트용 로그인 상태 설정
+#     session['user_id'] = 1
+#     session['email'] = "test@test.com"
 
 # 모델 로드
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
@@ -108,7 +108,7 @@ def get_diary_list():
 
         # 로그인한 사용자의 일기 가져오기
         user_id = session['user_id']
-        diaries = Diary.query.filter_by(user_id=user_id).paginate(page, per_page, False)
+        diaries = Diary.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page, error_out=False)
 
         # 일기 리스트 구성
         diary_list = [
