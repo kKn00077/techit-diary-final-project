@@ -151,25 +151,27 @@ def get_diary_by_id(diary_id):
 def detail_diary(diary_id):
     try:
         # 게시물 조회
-        post = Diary.query.filter(diary_id == diary_id).first()
+        diary = Diary.query.filter(diary_id == diary_id).first()
 
         # 게시물이 없는 경우 400
-        if not post:
+        if not diary:
              return jsonify({"code": 400, "body": {"error": {"message": "게시글을 찾지 못했어요"}}}), 400
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
-            "id": Diary.id,
-            "title": Diary.title,
-            "contents": Diary.contents,
-            "created_at": Diary.created_at,
-            "emotion_id": Diary.emotion_id  
+            "id": diary.id,
+            "title": diary.title,
+            "contents": diary.contents,
+            "created_at": diary.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "emotion": diary.emotion.name,
+            "tags": diary.tags.split(" "),
+            "advice": diary.advice
         }
 
-        return jsonify({"code": 200, "body": {"error": {"message": "게시글 조회에 성공했어요"}}}), 200
+        return jsonify({"code": 200, "body": {"message": "게시글 조회에 성공했어요", "diary" : context}}), 200
     except Exception as e:
         # 예외 처리
-        return jsonify({"code": 400, "body": {"error": {"message": "예기치못한 에러가 발생했어요"}}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "예기치 못한 에러가 발생했어요"}}}), 400
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
