@@ -12,17 +12,17 @@ import Neutral from '@/assets/emogi/Neutral.svg'
 
 export default function EmogiLabel({ id, direction = 'col' }) {
 	const emogiList = {
-		joy: { label: '기쁨', Emogi: Joy },
-		sadness: { label: '슬픔', Emogi: Sadness },
-		anger: { label: '분노', Emogi: Anger },
-		disgust: { label: '까칠함', Emogi: Disgust },
-		fear: { label: '두려움', Emogi: Fear },
-		anxiety: { label: '불안함', Emogi: Anxiety },
-		envy: { label: '부러움', Emogi: Envy },
-		ennui: { label: '따분함', Emogi: Ennui },
-		embarrassment: { label: '당황', Emogi: Embarrassment },
-		nostalgia: { label: '추억', Emogi: Nostalgia },
-		neutral: { label: '중립', Emogi: Neutral }
+		기쁨: { label: '기쁨', Emogi: Joy },
+		슬픔: { label: '슬픔', Emogi: Sadness },
+		화남: { label: '화남', Emogi: Anger },
+		까칠함: { label: '까칠함', Emogi: Disgust },
+		두려움: { label: '두려움', Emogi: Fear },
+		불안함: { label: '불안함', Emogi: Anxiety },
+		부러움: { label: '부러움', Emogi: Envy },
+		따분함: { label: '따분함', Emogi: Ennui },
+		당황함: { label: '당황함', Emogi: Embarrassment },
+		추억: { label: '추억', Emogi: Nostalgia },
+		중립: { label: '중립', Emogi: Neutral }
 	}
 
 	const emogiClass = {
