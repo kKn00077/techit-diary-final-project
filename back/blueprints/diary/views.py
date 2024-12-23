@@ -123,19 +123,15 @@ def get_diary_list():
         ]
 
         return jsonify({
-    "code": 200,
-    "body": {
-        "message": "일기 리스트 반환 성공",
-        "data": {
-            "diaries": diary_list,
-            "pagination": {
+            "code": 200,
+            "body": {
+                "message": "일기 리스트 반환 성공",
+                "diaries": diary_list,
                 "total": diaries.total,  # 전체 일기 수
                 "page": diaries.page,  # 현재 페이지
                 "pages": diaries.pages  # 전체 페이지 수
             }
-        }
-    }
-}), 200
+        }), 200
 
     except Exception as e:
         return jsonify({
