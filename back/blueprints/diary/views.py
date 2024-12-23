@@ -151,7 +151,7 @@ def get_diary_by_id(diary_id):
 def detail_diary(diary_id):
     try:
         # 게시물 조회
-        diary = Diary.query.filter(diary_id == diary_id).first()
+        diary = Diary.query.get(diary_id)
 
         # 게시물이 없는 경우 400
         if not diary:
