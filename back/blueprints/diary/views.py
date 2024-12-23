@@ -162,7 +162,7 @@ def detail_diary(diary_id):
             "id": diary.id,
             "title": diary.title,
             "contents": diary.contents,
-            "created_at": diary.created_at,
+            "created_at": diary.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "emotion": diary.emotion.name,
             "tags": diary.tags.split(" "),
             "advice": diary.advice
