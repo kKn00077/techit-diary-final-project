@@ -252,15 +252,20 @@ emotion_scores = {
 }
 
 def get_current_week_range():
-    # 오늘 날짜
-    today = datetime.now()
+    # 오늘 날짜 (시간제외하고 일자만 가져오기)
+    today_date = datetime.now().date()
     # 오늘이 몇 번째 요일인지(월요일=0, 일요일=6)
-    weekday = today.weekday()
+    weekday = today_date.weekday()
     # 이번주의 월요일 날짜 계산
-    monday = today - timedelta(days=weekday)
+    monday_date = today_date - timedelta(days=weekday)
     # 이번주의 일요일 날짜 계산 (월요일 + 6일)
-    sunday = monday + timedelta(days=6)
-    return monday, sunday
+    sunday_date = monday_date + timedelta(days=6)
+    
+    # 각각의 날짜를 "시각"까지 포함한 datetime으로 만들기
+    monday_start = datetime.combine(monday_date, datetime.min.time())   # 월요일 00:00:00
+    sunday_end = datetime.combine(sunday_date, datetime.max.time())    # 일요일 23:59:59.999999
+
+    return monday_start, sunday_end
 
 # 주간 평균 감정 점수 API
 @diary_bp.route('/score', methods=['GET'])
@@ -273,6 +278,7 @@ def get_weekly_scores():
     monday, sunday = get_current_week_range()
     
     # DB에서 이번 주 해당 기간의 일기 조회
+    # 현재 DB/Diary의 created_at, updated_at은 UTC 시간이므로, 한국 시간(KST)으로 변경해야 함
     diaries_this_week = (
         db.session.query(Diary, Emotion)
         .join(Emotion, Emotion.id == Diary.emotion_id)
