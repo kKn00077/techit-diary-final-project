@@ -12,6 +12,7 @@ import CloseRec from '@/assets/icon/filled/close-rectangle.svg'
 import AccountInfoView from '@/views/pages/AccountInfoView.jsx'
 import WriteView from '@/views/pages/WriteView.jsx'
 import DetailView from '@/views/pages/DetailView.jsx'
+import api from '@/api/index.js'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,5 +73,32 @@ const router = createRouter({
 		}
 	]
 })
+
+// 로그아웃 네비게이션 가드 추가
+router.beforeEach((to, from, next) => {
+	if (to.path === '/account/logout') {
+		// 로그아웃 함수 호출
+		logoutUser()
+		// 로그인 페이지로 리다이렉트
+		next('/auth/login')
+	} else {
+		next() // 다른 경로는 그대로 이동
+	}
+})
+
+async function logoutUser() {
+	try {
+		// TODO: URL Change
+		const response = await api.post('http://localhost:5000/auth/logout')
+		alert(response.data.body.message)
+	} catch (error) {
+		// 에러 메시지 처리
+		const msg =
+			error.response?.data?.body?.error?.message ||
+			'오류가 발생했어요! 새로고침 후 다시 시도해주세요! T.T'
+		console.log(error)
+		alert(msg)
+	}
+}
 
 export default router
