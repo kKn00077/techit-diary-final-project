@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session, make_response
 from werkzeug.security import generate_password_hash
 from models import db, User
-from flask_login import login_user
+from flask_login import login_user, logout_user
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -60,3 +60,10 @@ def login():
     else:  
         # 실패 응답
         return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
+
+# 로그아웃
+@auth_bp.route('/logout')
+def logout():
+    logout_user()
+    session.clear()
+    return jsonify({"code": 200, "body": {"message": "다음에 또 만나요!"}}), 200
