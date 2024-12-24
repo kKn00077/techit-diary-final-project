@@ -49,6 +49,9 @@ export default defineComponent({
 				})
 
 				alert(response.data.body.message)
+
+				// 회원가입 성공 후 리디렉션
+				router.push('/auth/login')
 			} catch (error) {
 				errorMessage.value =
 					error.response?.data?.body?.error?.message || '회원가입에 실패했어요!'
