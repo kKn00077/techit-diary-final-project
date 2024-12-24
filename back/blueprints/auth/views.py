@@ -69,6 +69,27 @@ def logout():
     session.clear()
     return jsonify({"code": 200, "body": {"message": "다음에 또 만나요!"}}), 200
 
+@auth_bp.route('/delete', methods=['DELETE'])
+def delete():
+    try:
+        # 로그인 정보 확인
+        if 'user_id' not in session:
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요!"}}}), 401
+        
+        # 사용자 조회
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            return jsonify({"code": 404, "body": {"error": {"message": "사용자를 찾을 수 없어요!"}}}), 404
+        
+        # 사용자 삭제
+        db.session.delete(user)
+        db.session.commit()
+        
+        return jsonify({"code": 200, "body": {"message": "다음 번에도 꼭 찾아주셔야 해요!"}}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"code": 500, "body": {"error": {"message": "사용자 삭제 중 오류가 발생했습니다.", "detail": f"{str(e)}"}}}), 500
 
 @auth_bp.route('/myinfo', methods=['GET'])
 def myinfo():
