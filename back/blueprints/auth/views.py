@@ -41,6 +41,7 @@ def signup():
         db.session.rollback()
         return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
 
+
 # 로그인
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -62,8 +63,18 @@ def login():
         return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
 
 # 로그아웃
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['POST'])
 def logout():
     logout_user()
     session.clear()
     return jsonify({"code": 200, "body": {"message": "다음에 또 만나요!"}}), 200
+
+
+@auth_bp.route('/myinfo', methods=['GET'])
+def myinfo():
+        # 로그인 정보 확인
+        if 'user_id' not in session:
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요!"}}}), 401
+
+        # 로그인 정보 반환
+        return jsonify({"code": 200, "body": {"message": "내 정보를 가지고 오는데에 성공했어요!", "info" : {"email" : session['email']}}}), 200
