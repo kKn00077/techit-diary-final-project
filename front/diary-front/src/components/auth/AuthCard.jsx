@@ -4,6 +4,7 @@ import Button from '../Button'
 import Logo from '../Logo'
 import api from '@/api'
 import { RouterLink, useRouter } from 'vue-router'
+import Cookies from 'js-cookie'
 
 export default defineComponent({
 	name: 'AuthCard',
@@ -76,6 +77,9 @@ export default defineComponent({
 					email: email.value,
 					password: password.value
 				})
+
+				// 로그인 성공 시 쿠키에 토큰 저장
+				Cookies.set('is_login', true)
 
 				alert(response.data.body.message + '\n이제 다이어리를 작성해보세요!')
 

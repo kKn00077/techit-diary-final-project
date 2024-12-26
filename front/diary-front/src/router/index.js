@@ -13,6 +13,7 @@ import AccountInfoView from '@/views/pages/AccountInfoView.jsx'
 import WriteView from '@/views/pages/WriteView.jsx'
 import DetailView from '@/views/pages/DetailView.jsx'
 import api from '@/api/index.js'
+import Cookies from 'js-cookie'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,17 +43,32 @@ const router = createRouter({
 				{
 					path: 'list',
 					component: () => MyDiaryView,
-					meta: { is_show: true, title: '내 일기', icon: Book }
+					meta: {
+						is_show: true,
+						title: '내 일기',
+						icon: Book,
+						requiresAuth: true
+					}
 				},
 				{
 					path: 'write',
 					component: () => WriteView,
-					meta: { is_show: true, title: '일기 쓰기', icon: Marker }
+					meta: {
+						is_show: true,
+						title: '일기 쓰기',
+						icon: Marker,
+						requiresAuth: true
+					}
 				},
 				{
 					path: 'detail/:id',
 					component: () => DetailView,
-					meta: { is_show: false, title: '내 일기', icon: Book }
+					meta: {
+						is_show: false,
+						title: '내 일기',
+						icon: Book,
+						requiresAuth: true
+					}
 				}
 			]
 		},
@@ -63,15 +79,44 @@ const router = createRouter({
 				{
 					path: 'info',
 					component: () => AccountInfoView,
-					meta: { is_show: true, title: '내 정보', icon: User }
+					meta: {
+						is_show: true,
+						title: '내 정보',
+						icon: User,
+						requiresAuth: true
+					}
 				},
 				{
 					path: 'logout',
-					meta: { is_show: true, title: '로그아웃', icon: CloseRec }
+					meta: {
+						is_show: true,
+						title: '로그아웃',
+						icon: CloseRec,
+						requiresAuth: true
+					}
 				}
 			]
 		}
 	]
+})
+
+// 로그인 여부 확인
+router.beforeEach((to, from, next) => {
+	const isLoggedIn = Cookies.get('is_login') !== undefined
+
+	console.log(isLoggedIn)
+
+	if (to.path === '/') {
+		return next(isLoggedIn ? '/diary/list' : '/auth/login')
+	} else if (
+		!(to.path === '/auth/login' || to.path === '/auth/join') &&
+		to.meta.requiresAuth &&
+		!isLoggedIn
+	) {
+		return next('/auth/login')
+	}
+
+	next()
 })
 
 // 로그아웃 네비게이션 가드 추가
@@ -91,6 +136,9 @@ async function logoutUser() {
 		// TODO: URL Change
 		const response = await api.post('http://localhost:5000/auth/logout')
 		alert(response.data.body.message)
+
+		// 쿠키 삭제
+		Cookies.remove('is_login')
 	} catch (error) {
 		// 에러 메시지 처리
 		const msg =
