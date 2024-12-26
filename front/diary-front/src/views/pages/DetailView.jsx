@@ -84,7 +84,7 @@ export default defineComponent(() => {
 						{diary.value.title}
 					</div>
 					<div class="flex flex-col gap-1 font-gowun-dodum">
-						<div class=" text-Black-black-800 text-base custom-text-base">
+						<div class=" text-Black-black-800 text-base custom-text-base text-right px-[10px]">
 							{diary.value.created_at
 								? formatDate(diary.value.created_at)
 								: '날짜를 못 찾았어요!'}
