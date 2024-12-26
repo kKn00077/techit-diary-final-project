@@ -100,7 +100,7 @@ def get_diary_list():
     try:
         # 로그인 확인
         if 'user_id' not in session:
-            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
 
         # 페이지 번호 가져오기 (기본값: 1)
         page = int(request.args.get('page', 1))
@@ -125,7 +125,7 @@ def get_diary_list():
         return jsonify({
             "code": 200,
             "body": {
-                "message": "일기 리스트 반환 성공",
+                "message": "일기 리스트를 성공적으로 가져왔어요!",
                 "diaries": diary_list,
                 "total": diaries.total,  # 전체 일기 수
                 "page": diaries.page,  # 현재 페이지
@@ -136,7 +136,7 @@ def get_diary_list():
     except Exception as e:
         return jsonify({
             "code": 500,
-            "body": {"error": {"message": "일기 리스트 반환 중 오류가 발생했습니다", "detail": f"{str(e)}"}}
+            "body": {"error": {"message": "일기 리스트 반환 중 오류가 발생했어요! T.T", "detail": f"{str(e)}"}}
         }), 500
 
 # 특정 일기 반환 (ID로 조회)
@@ -144,7 +144,7 @@ def get_diary_list():
 def get_diary_by_id(diary_id):
     if (diary := Diary.query.get(diary_id)):
         return jsonify({"code": 200, "body": {"id": diary.id, "title": diary.title, "contents": diary.contents, "created_at": diary.created_at}}), 200
-    return jsonify({"code": 404, "body":{"error": {"message":"일기를 찾을 수 없습니다."}}}), 404
+    return jsonify({"code": 404, "body":{"error": {"message":"일기를 찾을 수 없어요! 다른 일기를 보는 건 어떨까요?"}}}), 404
 
 # 일기 상세 조회
 @diary_bp.route('/detail/<int:diary_id>')
@@ -155,7 +155,7 @@ def detail_diary(diary_id):
 
         # 게시물이 없는 경우 400
         if not diary:
-             return jsonify({"code": 400, "body": {"error": {"message": "게시글을 찾지 못했어요"}}}), 400
+             return jsonify({"code": 400, "body": {"error": {"message": "일기를 찾을 수 없어요! 다른 일기를 보는 건 어떨까요?"}}}), 400
 
         # id, 제목, 내용, 작성날짜, 감정
         context = {
@@ -168,10 +168,10 @@ def detail_diary(diary_id):
             "advice": diary.advice
         }
 
-        return jsonify({"code": 200, "body": {"message": "게시글 조회에 성공했어요", "diary" : context}}), 200
+        return jsonify({"code": 200, "body": {"message": "일기 조회에 성공했어요!", "diary" : context}}), 200
     except Exception as e:
         # 예외 처리
-        return jsonify({"code": 400, "body": {"error": {"message": "예기치 못한 에러가 발생했어요"}}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "예기치 못한 에러가 발생했어요! 새로고침 후 다시 시도해주세요. T.T"}}}), 400
     
 # 일기 생성 API
 # GET: 폼 렌더링 / POST: 데이터 처리
@@ -188,11 +188,11 @@ def create_diary():
 
             # 유효성 불일치(Error)
             if not title or not contents:
-                return jsonify({"code": 400, "body": {"error": {"message": "제목 또는 내용이 없어요"}}}), 400
+                return jsonify({"code": 400, "body": {"error": {"message": "제목 또는 내용이 없어요! 입력 후 다시 시도해주세요!"}}}), 400
 
             # 로그인 정보 없음(Error)
             if 'user_id' not in session:
-                return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+                return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
 
             # 감정 분석
             emotion = classify_emotion(f"{title} {contents}")
@@ -220,7 +220,7 @@ def create_diary():
             return jsonify({
                 "code": 201,
                 "body": {
-                    "message": "일기가 정상적으로 생성되었어요",
+                    "message": "일기가 정상적으로 생성되었어요!",
                     "diary": {
                         "id": diary_entry.id,
                         "title": diary_entry.title,
@@ -235,7 +235,7 @@ def create_diary():
         
         except Exception as e:
             # 서버 에러(코드 수정으로 대응할 수 없는 에러)
-            return jsonify({"code": 500, "body": {"error": {"message": f"예기치못한 에러가 발생했어요: {str(e)}"}}}), 500
+            return jsonify({"code": 500, "body": {"error": {"message": f"예기치 못한 에러가 발생했어요: {str(e)}"}}}), 500
 
 
 # 감정 점수
@@ -274,7 +274,7 @@ def get_current_week_range():
 def get_weekly_scores():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
 
     # 이번 주 월~일 날짜 구하기
     monday, sunday = get_current_week_range()
@@ -291,7 +291,7 @@ def get_weekly_scores():
     )
 
     if not diaries_this_week:
-        return jsonify({"code": 400, "body": {"error": {"message": "이번 주에 작성한 일기가 없어요"}}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "이번 주에 작성한 일기가 없어요!"}}}), 400
 
     scores_by_day = {i: [] for i in range(7)}
     counts_by_day = {i: 0 for i in range(7)}  # 요일별 일기 개수
@@ -318,7 +318,7 @@ def get_weekly_scores():
             "count": counts_by_day[i]  # 해당 요일의 일기 개수
         })
 
-    return jsonify({"code": 200, "body": {"message": "이번주 감정 점수", "data": avg_scores}}), 200
+    return jsonify({"code": 200, "body": {"message": "이번주 감정 점수 차트 데이터를 무사히 가지고 왔어요!", "data": avg_scores}}), 200
 
 
 # 감정별 비율 API
@@ -326,7 +326,7 @@ def get_weekly_scores():
 def get_emotion_distribution():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
     
     # 감정별 분포 데이터 가져오기
     emotion_counts = (
@@ -338,7 +338,7 @@ def get_emotion_distribution():
     )
     
     if not emotion_counts:
-        return jsonify({"code": 400, "body": {"error": {"message": "아직 일기가 없어요"}}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "아직 일기가 없어요! 일기를 새로 작성해보시는 건 어떨까요?"}}}), 400
     
     counts_map = {eid: c for eid, c in emotion_counts}
     ordered_emotions = [label_decoding[i] for i in sorted(label_decoding.keys())]
@@ -355,14 +355,14 @@ def get_emotion_distribution():
             "count": count  # 해당 감정의 일기 개수
         })
     
-    return jsonify({"code": 200, "body": {"message": "감정별 분포", "data": distribution}}), 200
+    return jsonify({"code": 200, "body": {"message": "감정별 분포 차트 데이터를 무사히 가지고 왔어요!", "data": distribution}}), 200
 
 # 차트 페이지 라우트
 @diary_bp.route('/chart', methods=['GET'])
 def weekly_chart():
     # 로그인 정보 없음(Error)
     if 'user_id' not in session:
-        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+        return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
 
     # 이번 주 월~일 날짜 구하기
     monday, sunday = get_current_week_range()
@@ -399,24 +399,24 @@ def delete_diary(diary_id):
     try:
         # 로그인 정보 확인
         if 'user_id' not in session:
-            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요"}}}), 401
+            return jsonify({"code": 401, "body": {"error": {"message": "로그인 정보가 없어요! 로그인 후 다시 시도해주세요!"}}}), 401
 
         # 데이터베이스에서 해당 ID의 일기 조회
         diary = Diary.query.get(diary_id)
 
         # 일기가 존재하지 않을 경우
         if not diary:
-            return jsonify({"code": 400, "body": {"error": {"message": "삭제할 일기를 찾을 수 없습니다."}}}), 400
+            return jsonify({"code": 400, "body": {"error": {"message": "일기를 찾을 수 없어요!"}}}), 400
 
         # 삭제 권한 확인 (로그인한 사용자의 일기인지 확인)
         if diary.user_id != session['user_id']:
-            return jsonify({"code": 401, "body": {"error": {"message": "삭제 권한이 없습니다."}}}), 401
+            return jsonify({"code": 401, "body": {"error": {"message": "삭제 권한이 없어요! 다른 유저 일기는 손대지 말도록 해요!"}}}), 401
 
         # 일기 삭제
         db.session.delete(diary)
         db.session.commit()
-        return jsonify({"code": 200, "body": {"message": "일기가 성공적으로 삭제되었습니다."}}), 200
+        return jsonify({"code": 200, "body": {"message": "일기가 성공적으로 삭제되었어요! 새로운 일기 작성해주실 거죠?"}}), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"code": 500, "body": {"error": {"message": "일기 삭제 중 오류가 발생했습니다", "detail": f"{str(e)}"}}}), 500
+        return jsonify({"code": 500, "body": {"error": {"message": "일기 삭제 중 오류가 발생했어요 T.T 새로고침 후 다시 시도해주세요!", "detail": f"{str(e)}"}}}), 500

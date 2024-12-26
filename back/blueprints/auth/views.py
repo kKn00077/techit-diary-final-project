@@ -17,15 +17,15 @@ def signup():
 
         # 필수 데이터 확인
         if not email or not password:
-            return jsonify({"code":400, "body":{"error": {"message": "모든 필드를 입력해야 합니다."}}}), 400
+            return jsonify({"code":400, "body":{"error": {"message": "모든 필드를 입력해야 가입할 수 있어요! 입력란을 한번만 다시 확인해주시겠어요?"}}}), 400
         
         if password != password_confirm:
-            return jsonify({"code": 400, "body": {"error": {"message": "비밀번호가 일치하지 않습니다."}}}), 400
+            return jsonify({"code": 400, "body": {"error": {"message": "비밀번호가 일치하지 않아요! 다시 확인해주세요!"}}}), 400
 
         # 이미 존재하는 사용자 확인
         existing_user = User.query.filter(User.email == email).first()
         if existing_user:
-            return jsonify({"code":409, "body":{"error": {"message": "이미 존재하는 사용자입니다."}}}), 409
+            return jsonify({"code":409, "body":{"error": {"message": "이미 가입한 계정으로 확인이 돼요!"}}}), 409
 
         # 새로운 사용자 생성
         new_user = User(
@@ -35,11 +35,11 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({"code":201, "body":{"message": "회원가입이 성공적으로 완료되었습니다."}}), 201
+        return jsonify({"code":201, "body":{"message": "회원가입이 무사히 완료되었어요! 이제 일기를 쓰러 가볼까요?"}}), 201
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했습니다", "detail":f"{str(e)}"}}}), 500
+        return jsonify({"code":500, "body":{"error": {"message": "회원가입 중 오류가 발생했어요! T.T 새로고침 후 다시 시도해주세요!", "detail":f"{str(e)}"}}}), 500
 
 
 # 로그인
@@ -56,11 +56,11 @@ def login():
         session['email'] = user.email  
         session['user_id'] = user.id
         
-        return jsonify({"code": 200, "body": {"message": "로그인이 성공적으로 완료되었습니다."}})
+        return jsonify({"code": 200, "body": {"message": "로그인이 성공적으로 완료되었어요! 같이 일기 작성하러 가볼까요?"}})
 
     else:  
         # 실패 응답
-        return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요."}}}), 400
+        return jsonify({"code": 400, "body": {"error": {"message": "로그인에 실패했어요! T.T 이메일 또는 비밀번호를 확인해주시겠어요?"}}}), 400
 
 # 로그아웃
 @auth_bp.route('/logout', methods=['POST'])
