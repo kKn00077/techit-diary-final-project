@@ -52,7 +52,7 @@ def classify_emotion(text):
     return label_decoding[predicted_label]
 
 # OpenAI API 키 설정 (실제키는 디스코드 1조 참조)
-client = OpenAI(api_key = "YOUR-OPENAI-API-KEY")
+client = OpenAI(api_key = "YOUR_API_KEY")
 
 # OpenAI API를 사용한 태그 생성 함수
 def extract_tags(text):

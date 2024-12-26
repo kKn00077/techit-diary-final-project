@@ -9,7 +9,7 @@ import pytz
 # KST를 반환하는 함수 추가
 def kst_now():
     now = datetime.now(pytz.timezone('Asia/Seoul'))
-    return now.strftime('%Y-%m-%d %H:%M:%S')
+    return now.replace(microsecond=0)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -17,8 +17,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.String(19), nullable=False, default=kst_now)
-    updated_at = db.Column(db.String(19), nullable=False, default=kst_now, onupdate=kst_now)
+    created_at = db.Column(db.DateTime, nullable=False, default=kst_now)
+    updated_at = db.Column(db.DateTime, nullable=False, default=kst_now, onupdate=kst_now)
     
     diaries = db.relationship('Diary', backref='user', cascade="all, delete-orphan")  # `user`로 역참조
     
@@ -36,8 +36,8 @@ class Diary(db.Model):
     title = db.Column(db.String(100), nullable=False)
     contents = db.Column(db.String(1000), nullable=False)
 
-    created_at = db.Column(db.String(19), nullable=False, default=kst_now)
-    updated_at = db.Column(db.String(19), nullable=False, default=kst_now, onupdate=kst_now)
+    created_at = db.Column(db.DateTime, nullable=False, default=kst_now)
+    updated_at = db.Column(db.DateTime, nullable=False, default=kst_now, onupdate=kst_now)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     emotion_id = db.Column(db.Integer, db.ForeignKey('emotions.id'), nullable=False)
@@ -52,5 +52,5 @@ class Emotion(db.Model):
     name = db.Column(db.String(5), nullable=False)
     icon = db.Column(db.String(15), nullable=False)
 
-    diaries = db.relationship('Diary', backref='emotion', cascade="all, delete-orphan")  # `emotion`으로 역참조
+    diaries = db.relationship('Diary', backref='emotion', cascade="all, delete-orphan")  # `motion`으로 역참조
 
