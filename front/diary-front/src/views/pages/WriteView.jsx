@@ -3,12 +3,15 @@ import TextBox from '@/components/TextBox'
 import Save from '@/assets/icon/filled/save.svg'
 import { defineComponent, ref } from 'vue'
 import api from '@/api'
+import { useRouter } from 'vue-router'
 
 export default defineComponent(() => {
 	const title = ref('')
 	const contents = ref('')
 	const errorMessage = ref('')
 	const isLoading = ref(false)
+
+	const router = useRouter()
 
 	const handleSave = async () => {
 		if (title.value === '' || contents.value === '') {
@@ -29,6 +32,8 @@ export default defineComponent(() => {
 			})
 
 			alert(response.data.body.message)
+
+			router.push('/diary/list')
 		} catch (error) {
 			errorMessage.value =
 				error.response?.data?.body?.error?.message ||
