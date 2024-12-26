@@ -47,7 +47,7 @@ export default defineComponent(() => {
 				error.response?.data?.body?.error?.message ||
 				'차트 정보를 가져오는데 실패했어요! 새로고침 후 다시 접속해주세요! T.T'
 			console.log(error)
-			alert(errorMessage.value)
+			console.log(errorMessage.value)
 		}
 	}
 
@@ -64,7 +64,7 @@ export default defineComponent(() => {
 				error.response?.data?.body?.error?.message ||
 				'차트 정보를 가져오는데 실패했어요! 새로고침 후 다시 접속해주세요! T.T'
 			console.log(error)
-			alert(errorMessage.value)
+			console.log(errorMessage.value)
 		}
 	}
 
@@ -117,24 +117,30 @@ export default defineComponent(() => {
 					</div>
 				</CardHeader>
 				<CardContents className="items-start">
-					<EmotionChart
-						type="line"
-						labels={weekly.value.map((item) => item.day)}
-						data={weekly.value.map((item) => item.average_score)}
-						counts={weekly.value.map((item) => item.count)}
-						options={{
-							scales: {
-								x: {
-									ticks: { font: { size: 14 } }
-								},
-								y: {
-									beginAtZero: true,
-									max: 10,
-									ticks: { font: { size: 14 } }
+					{weekly.value.length > 0 ? (
+						<EmotionChart
+							type="line"
+							labels={weekly.value.map((item) => item.day)}
+							data={weekly.value.map((item) => item.average_score)}
+							counts={weekly.value.map((item) => item.count)}
+							options={{
+								scales: {
+									x: {
+										ticks: { font: { size: 14 } }
+									},
+									y: {
+										beginAtZero: true,
+										max: 10,
+										ticks: { font: { size: 14 } }
+									}
 								}
-							}
-						}}
-					/>
+							}}
+						/>
+					) : (
+						<div class="text-Black-black-900 text-center text-base custom-text-base">
+							이번 주 데이터가 없습니다. 기록을 시작해보세요!
+						</div>
+					)}
 				</CardContents>
 			</Card>
 
@@ -148,27 +154,33 @@ export default defineComponent(() => {
 					</div>
 				</CardHeader>
 				<CardContents className="items-start">
-					<EmotionChart
-						type="bar"
-						labels={distribution.value.map((item) => item.emotion)}
-						data={distribution.value.map((item) => item.percentage)}
-						counts={distribution.value.map((item) => item.count)}
-						options={{
-							scales: {
-								x: {
-									ticks: { display: false }
-								},
-								y: {
-									beginAtZero: true,
-									max: 100,
-									ticks: {
-										callback: (value) => `${value}%`,
-										font: { size: 14 }
+					{distribution.value.length > 0 ? (
+						<EmotionChart
+							type="bar"
+							labels={distribution.value.map((item) => item.emotion)}
+							data={distribution.value.map((item) => item.percentage)}
+							counts={distribution.value.map((item) => item.count)}
+							options={{
+								scales: {
+									x: {
+										ticks: { display: false }
+									},
+									y: {
+										beginAtZero: true,
+										max: 100,
+										ticks: {
+											callback: (value) => `${value}%`,
+											font: { size: 14 }
+										}
 									}
 								}
-							}
-						}}
-					/>
+							}}
+						/>
+					) : (
+						<div class="text-Black-black-900 text-center text-base custom-text-base">
+							분석할 감정 데이터가 없습니다. 감정을 기록해보세요!
+						</div>
+					)}
 				</CardContents>
 			</Card>
 

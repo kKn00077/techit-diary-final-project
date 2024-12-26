@@ -81,7 +81,7 @@ export default defineComponent({
 				// 로그인 성공 시 쿠키에 토큰 저장
 				Cookies.set('is_login', true)
 
-				alert(response.data.body.message + '\n이제 다이어리를 작성해보세요!')
+				alert(response.data.body.message)
 
 				// 회원가입 성공 후 리디렉션
 				router.push('/diary')
