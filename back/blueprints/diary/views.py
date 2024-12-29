@@ -6,7 +6,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime, timedelta
 from openai import OpenAI
 from login import load_user
+import pytz
 
+# KST 시간대 설정
+KST = pytz.timezone('Asia/Seoul')
 
 # 블루프린트 정의 (템플릿 폴더 경로 추가)
 diary_bp = Blueprint('diary', __name__, 
@@ -255,7 +258,7 @@ emotion_scores = {
 
 def get_current_week_range():
     # 오늘 날짜 (시간제외하고 일자만 가져오기)
-    today_date = datetime.now().date()
+    today_date = datetime.now(KST).date()
     # 오늘이 몇 번째 요일인지(월요일=0, 일요일=6)
     weekday = today_date.weekday()
     # 이번주의 월요일 날짜 계산
@@ -264,8 +267,8 @@ def get_current_week_range():
     sunday_date = monday_date + timedelta(days=6)
     
     # 각각의 날짜를 "시각"까지 포함한 datetime으로 만들기
-    monday_start = datetime.combine(monday_date, datetime.min.time())   # 월요일 00:00:00
-    sunday_end = datetime.combine(sunday_date, datetime.max.time())    # 일요일 23:59:59.999999
+    monday_start = datetime.combine(monday_date, datetime.min.time(), KST)   # 월요일 00:00:00
+    sunday_end = datetime.combine(sunday_date, datetime.max.time(), KST)    # 일요일 23:59:59.999999
 
     return monday_start, sunday_end
 
