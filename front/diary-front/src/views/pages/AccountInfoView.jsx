@@ -4,7 +4,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card/Card'
 import CardContents from '@/components/Card/CardContents'
 import CardHeader from '@/components/Card/CardHeader'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import EmotionChart from '@/components/EmotionChart'
 
@@ -16,11 +16,18 @@ export default defineComponent(() => {
 	const weekly = ref([])
 	const distribution = ref([])
 	const errorMessage = ref('')
+	const isUnmounted = ref(false) // 컴포넌트 언마운트 상태를 추적
 
 	const loadEmail = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
-			const response = await api.get('http://localhost:5000/auth/myinfo')
+			const response = await api.get(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/auth/myinfo'
+			)
 
 			console.log(response.data.body.message)
 
@@ -36,8 +43,14 @@ export default defineComponent(() => {
 
 	const weeklyScore = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
-			const response = await api.get('http://localhost:5000/diary/score')
+			const response = await api.get(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/score'
+			)
 
 			console.log(response.data.body.message)
 
@@ -53,8 +66,14 @@ export default defineComponent(() => {
 
 	const distributionScore = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
-			const response = await api.get('http://localhost:5000/diary/distribution')
+			const response = await api.get(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/distribution'
+			)
 
 			console.log(response.data.body.message)
 
@@ -70,12 +89,18 @@ export default defineComponent(() => {
 
 	const accountDelete = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
-			const response = await api.delete('http://localhost:5000/auth/delete')
+			const response = await api.delete(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/auth/delete'
+			)
 
 			alert(response.data.body.message)
 
-			router.push('/auth/login')
+			router.push('/account/logout')
 		} catch (error) {
 			errorMessage.value =
 				error.response?.data?.body?.error?.message ||
@@ -87,9 +112,20 @@ export default defineComponent(() => {
 
 	// 컴포넌트 마운트 시 데이터 로드
 	onMounted(() => {
+		if (isUnmounted.value) {
+			return // 방어 코드 추가
+		}
 		loadEmail()
 		weeklyScore()
 		distributionScore()
+	})
+
+	onBeforeUnmount(() => {
+		email.value = ''
+		weekly.value = []
+		distribution.value = []
+		errorMessage.value = ''
+		isUnmounted.value = true // 언마운트 상태로 설정
 	})
 
 	return () => (

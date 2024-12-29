@@ -1,9 +1,14 @@
 import AuthCard from '@/components/auth/AuthCard'
 
-export default function LoginView() {
+function JoinView() {
 	return (
 		<div>
 			<AuthCard type="join" />
 		</div>
 	)
 }
+
+// displayName 추가
+JoinView.displayName = 'JoinView'
+
+export default JoinView

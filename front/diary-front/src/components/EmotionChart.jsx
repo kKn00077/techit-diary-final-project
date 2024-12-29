@@ -1,4 +1,11 @@
-import { defineComponent, onMounted, ref, watch, watchEffect } from 'vue'
+import {
+	defineComponent,
+	onMounted,
+	onUnmounted,
+	ref,
+	watch,
+	watchEffect
+} from 'vue'
 import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
@@ -41,7 +48,7 @@ export default defineComponent({
 		const preloadedImages = {}
 		for (const label of props.labels) {
 			const emotionKey = getEmotionKey(label)
-			const svgSrc = `/src/assets/emogi/${emotionKey}.svg`
+			const svgSrc = `/emogi/${emotionKey}.svg`
 
 			const img = new Image()
 			img.src = svgSrc
@@ -204,6 +211,14 @@ export default defineComponent({
 				props.data
 			)
 			createChart() // chartRef와 props를 감지해 차트를 업데이트
+		})
+
+		// 컴포넌트가 언마운트될 때 차트 정리
+		onUnmounted(() => {
+			if (chartInstance) {
+				chartInstance.destroy()
+				chartInstance = null
+			}
 		})
 
 		return () => <canvas ref={chartRef} style="height: 400px; width: 100%;" />

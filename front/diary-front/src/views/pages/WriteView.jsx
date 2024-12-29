@@ -1,7 +1,7 @@
 import Button from '@/components/Button'
 import TextBox from '@/components/TextBox'
 import Save from '@/assets/icon/filled/save.svg'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '@/api'
 import { useRouter } from 'vue-router'
 
@@ -10,10 +10,29 @@ export default defineComponent(() => {
 	const contents = ref('')
 	const errorMessage = ref('')
 	const isLoading = ref(false)
+	const isUnmounted = ref(false) // 컴포넌트 언마운트 상태를 추적
+
+	onBeforeUnmount(() => {
+		title.value = ''
+		contents.value = ''
+		isLoading.value = false
+		errorMessage.value = ''
+		isUnmounted.value = true // 언마운트 상태로 설정
+	})
+
+	onMounted(() => {
+		if (isUnmounted.value) {
+			return // 방어 코드 추가
+		}
+	})
 
 	const router = useRouter()
 
 	const handleSave = async () => {
+		if (isUnmounted.value) {
+			return
+		}
+
 		if (title.value === '' || contents.value === '') {
 			errorMessage.value = '값을 모두 입력해야 일기 저장이 가능해요!'
 			alert(errorMessage.value)
@@ -22,19 +41,22 @@ export default defineComponent(() => {
 
 		isLoading.value = true
 
-		console.log(title.value, contents.value)
-
 		try {
 			// TODO: URL Change
-			const response = await api.post('http://localhost:5000/diary/create', {
-				title: title.value,
-				contents: contents.value
-			})
+			const response = await api.post(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/create',
+				{
+					title: title.value,
+					contents: contents.value
+				}
+			)
 
 			alert(response.data.body.message)
 
 			router.push('/diary/list')
 		} catch (error) {
+			console.log(error)
+
 			errorMessage.value =
 				error.response?.data?.body?.error?.message ||
 				'일기 저장에 실패했어요! 나중에 다시 시도해주세요! T.T'

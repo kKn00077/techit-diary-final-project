@@ -2,7 +2,7 @@ import { RouterView } from 'vue-router'
 import backgroundImg from '@/assets/img/background-img.png'
 import Footer from '@/components/Layout/Footer'
 
-export default function AuthLayout() {
+function AuthLayout() {
 	return (
 		<div class="bg-purple-50 relative w-screen h-screen">
 			<div
@@ -17,3 +17,8 @@ export default function AuthLayout() {
 		</div>
 	)
 }
+
+// displayName 추가
+AuthLayout.displayName = 'AuthLayout'
+
+export default AuthLayout

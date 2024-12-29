@@ -5,7 +5,7 @@ import EmogiLabel from '@/components/EmogiLabel'
 import Minus from '@/assets/icon/filled/minus.svg'
 import Archive from '@/assets/icon/filled/archive.svg'
 import Button from '@/components/Button'
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import { formatDate } from '@/lib/utils'
@@ -23,15 +23,35 @@ export default defineComponent(() => {
 	})
 	const errorMessage = ref('')
 	const isLoading = ref(false)
+	const isUnmounted = ref(false) // 컴포넌트 언마운트 상태를 추적
+
+	onBeforeUnmount(() => {
+		diary.value = {
+			advice: 'Today I Feel.',
+			contents: '',
+			created_at: '',
+			emotion: '중립',
+			id: 0,
+			tags: ['#Today', '#I', '#Feel'],
+			title: ''
+		}
+		isLoading.value = false
+		errorMessage.value = ''
+		isUnmounted.value = true // 언마운트 상태로 설정
+	})
 
 	const router = useRouter()
 	const route = useRoute()
 
 	const loadData = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
 			const response = await api.get(
-				`http://localhost:5000/diary/detail/${route.params.id}`
+				`http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/detail/${route.params.id}`
 			)
 
 			console.log(response.data.body)
@@ -48,11 +68,15 @@ export default defineComponent(() => {
 
 	const deleteDiary = async (id) => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			isLoading.value = true
 
 			// TODO: URL Change
 			const response = await api.delete(
-				`http://localhost:5000/diary/delete/${id}`
+				`http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/delete/${id}`
 			)
 
 			alert(response.data.body.message)
@@ -73,6 +97,9 @@ export default defineComponent(() => {
 
 	// 컴포넌트 마운트 시 데이터 로드
 	onMounted(() => {
+		if (isUnmounted.value) {
+			return // 방어 코드 추가
+		}
 		loadData()
 	})
 
@@ -124,11 +151,13 @@ export default defineComponent(() => {
 					}}>
 					삭제
 				</Button>
-				<RouterLink to="/diary">
-					<Button variant="secondary" leftIcon={Archive}>
-						일기 목록
-					</Button>
-				</RouterLink>
+				{!isUnmounted.value && (
+					<RouterLink to="/diary">
+						<Button variant="secondary" leftIcon={Archive}>
+							일기 목록
+						</Button>
+					</RouterLink>
+				)}
 			</div>
 		</div>
 	)

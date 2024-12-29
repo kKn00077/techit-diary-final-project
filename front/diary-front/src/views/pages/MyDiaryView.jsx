@@ -8,7 +8,7 @@ import Button from '@/components/Button'
 import LeftArrow from '@/assets/icon/outline/left-arrow.svg'
 import RightArrow from '@/assets/icon/outline/right-arrow.svg'
 import { RouterLink } from 'vue-router'
-import { onMounted, ref, watch, defineComponent } from 'vue'
+import { onMounted, ref, watch, defineComponent, onBeforeUnmount } from 'vue'
 import api from '@/api'
 import { formatDate } from '@/lib/utils'
 import CardFooter from '@/components/Card/CardFooter'
@@ -20,18 +20,38 @@ export default defineComponent(() => {
 	const page = ref(1)
 	const pages = ref(0)
 	const errorMessage = ref('')
+	const isUnmounted = ref(false) // 컴포넌트 언마운트 상태를 추적
+
+	const controller = new AbortController() // AbortController 인스턴스 생성
+
+	onBeforeUnmount(() => {
+		diaryList.value = []
+		page.value = 1
+		pages.value = 0
+		errorMessage.value = ''
+		controller.abort()
+		isUnmounted.value = true // 언마운트 상태로 설정
+	})
 
 	const loadData = async () => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
-			const response = await api.get('http://localhost:5000/diary/list', {
-				params: { page: page.value }
-			})
+			const response = await api.get(
+				'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/list',
+				{
+					params: { page: page.value },
+					signal: controller.signal // AbortController의 signal 전달
+				}
+			)
 
 			console.log(response.data.body.message)
 
-			diaryList.value = response.data.body.diaries
-			pages.value = response.data.body.pages
+			diaryList.value = response.data.body?.diaries || []
+			pages.value = response.data.body?.pages || 1
 
 			if (diaryList.value.length === 0) {
 				alert('아직 작성한 일기가 없네요! 일기를 작성해보는 건 어떨까요?')
@@ -47,9 +67,16 @@ export default defineComponent(() => {
 
 	const deleteDiary = async (id) => {
 		try {
+			if (isUnmounted.value) {
+				return
+			}
+
 			// TODO: URL Change
 			const response = await api.delete(
-				`http://localhost:5000/diary/delete/${id}`
+				`http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/diary/delete/${id}`,
+				{
+					signal: controller.signal // AbortController의 signal 전달
+				}
 			)
 
 			alert(response.data.body.message)
@@ -67,6 +94,9 @@ export default defineComponent(() => {
 
 	// 컴포넌트 마운트 시 데이터 로드
 	onMounted(() => {
+		if (isUnmounted.value) {
+			return // 방어 코드 추가
+		}
 		loadData()
 	})
 
@@ -78,42 +108,43 @@ export default defineComponent(() => {
 	return () => (
 		<div class="flex flex-col gap-10 2xl:w-3/4 mx-auto">
 			<div class="flex flex-row flex-wrap gap-6 justify-center ">
-				{diaryList.value.map((diary) => (
-					<RouterLink to={`/diary/detail/${diary.id}`} key={diary.id}>
-						<Card className="col-span-1 w-56 h-72 px-6 py-4 justify-between">
-							<CardHeader className="justify-between">
-								<div class="font-gowun-batang font-bold">
-									{formatDate(diary.created_at)}
-								</div>
-								<Minus
-									class="size-4 fill-Black-black-1000 cursor-pointer"
-									onClick={(event) => {
-										event.preventDefault() // LouterLink 클릭 이벤트 방지
+				{!isUnmounted.value &&
+					diaryList.value.map((diary) => (
+						<RouterLink to={`/diary/detail/${diary.id}`} key={diary.id}>
+							<Card className="col-span-1 w-56 h-72 px-6 py-4 justify-between">
+								<CardHeader className="justify-between">
+									<div class="font-gowun-batang font-bold">
+										{formatDate(diary.created_at)}
+									</div>
+									<Minus
+										class="size-4 fill-Black-black-1000 cursor-pointer"
+										onClick={(event) => {
+											event.preventDefault() // LouterLink 클릭 이벤트 방지
 
-										if (
-											confirm(
-												'정말로 삭제하시겠어요? 한번 삭제하면 복구할 수 없어요!'
-											)
-										) {
-											deleteDiary(diary.id)
-										}
-									}}
-								/>
-							</CardHeader>
-							<CardContents className="h-full">
-								<EmogiLabel id={diary.emotion} direction="col" />
-							</CardContents>
-							<CardFooter>
-								<div class="text-md custom-text-md truncate font-gowun-batang font-bold text-Black-black-900">
-									{diary.title}
-								</div>
-								<div className="text-base custom-text-base truncate font-gowun-dodum text-Black-black-800">
-									{diary.contents}
-								</div>
-							</CardFooter>
-						</Card>
-					</RouterLink>
-				))}
+											if (
+												confirm(
+													'정말로 삭제하시겠어요? 한번 삭제하면 복구할 수 없어요!'
+												)
+											) {
+												deleteDiary(diary.id)
+											}
+										}}
+									/>
+								</CardHeader>
+								<CardContents className="h-full">
+									<EmogiLabel id={diary.emotion} direction="col" />
+								</CardContents>
+								<CardFooter>
+									<div class="text-md custom-text-md truncate font-gowun-batang font-bold text-Black-black-900">
+										{diary.title}
+									</div>
+									<div className="text-base custom-text-base truncate font-gowun-dodum text-Black-black-800">
+										{diary.contents}
+									</div>
+								</CardFooter>
+							</Card>
+						</RouterLink>
+					))}
 
 				{Array.from({ length: 8 - diaryList.value.length }).map((_, index) => (
 					<Card className="col-span-1 w-56 h-72 px-6 py-4 !bg-Black-black-400">

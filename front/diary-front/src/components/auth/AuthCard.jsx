@@ -1,4 +1,10 @@
-import { defineComponent, ref } from 'vue'
+import {
+	defineComponent,
+	onBeforeUnmount,
+	onMounted,
+	onUnmounted,
+	ref
+} from 'vue'
 import TextBox from '../TextBox'
 import Button from '../Button'
 import Logo from '../Logo'
@@ -12,6 +18,25 @@ export default defineComponent({
 		type: { type: String, default: 'login' } // 'login' or 'signup'
 	},
 	setup(props) {
+		const controller = new AbortController() // AbortController 인스턴스 생성
+		const isUnmounted = ref(false) // 컴포넌트 언마운트 상태를 추적
+
+		onBeforeUnmount(() => {
+			email.value = ''
+			password.value = ''
+			confirmPassword.value = ''
+			isLoading.value = false
+			errorMessage.value = ''
+			controller.abort() // 언마운트 시 요청 취소
+			isUnmounted.value = true // 언마운트 상태로 설정
+		})
+
+		onMounted(() => {
+			if (isUnmounted.value) {
+				return // 방어 코드 추가
+			}
+		})
+
 		const router = useRouter()
 		const isLogin = props.type === 'login'
 
@@ -42,16 +67,23 @@ export default defineComponent({
 			isLoading.value = true
 
 			try {
+				if (isUnmounted.value) {
+					return
+				}
 				// TODO: URL Change
-				const response = await api.post('http://localhost:5000/auth/signup', {
-					email: email.value,
-					password: password.value,
-					password_confirm: confirmPassword.value
-				})
+				const response = await api.post(
+					'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/auth/signup',
+					{
+						email: email.value,
+						password: password.value,
+						password_confirm: confirmPassword.value
+					},
+					{
+						signal: controller.signal
+					}
+				)
 
 				alert(response.data.body.message)
-
-				// 회원가입 성공 후 리디렉션
 				router.push('/auth/login')
 			} catch (error) {
 				errorMessage.value =
@@ -72,21 +104,28 @@ export default defineComponent({
 			isLoading.value = true
 
 			try {
+				if (isUnmounted.value) {
+					return
+				}
+
 				// TODO: URL Change
-				const response = await api.post('http://localhost:5000/auth/login', {
-					email: email.value,
-					password: password.value
-				})
+				const response = await api.post(
+					'http://ec2-3-34-61-96.ap-northeast-2.compute.amazonaws.com:8000/auth/login',
+					{
+						email: email.value,
+						password: password.value
+					},
+					{
+						signal: controller.signal
+					}
+				)
 
-				// 로그인 성공 시 쿠키에 토큰 저장
 				Cookies.set('is_login', true)
-
 				alert(response.data.body.message)
-
-				// 회원가입 성공 후 리디렉션
-				router.push('/diary')
+				router.push('/diary/list')
 			} catch (error) {
 				console.log(error)
+
 				errorMessage.value =
 					error.response?.data?.body?.error?.message ||
 					'계정을 다시 한번 확인해주세요!'
@@ -134,11 +173,11 @@ export default defineComponent({
 								variant="primary"
 								class="w-full"
 								disabled={isLoading.value}
-								onClick={() => {
+								onClick={async () => {
 									try {
-										handleLogin()
+										await handleLogin()
 									} catch (e) {
-										console.error('Unexpected error in onClick:', e)
+										console.error('오류 발생:', e)
 										alert('오류가 발생했어요! 나중에 다시 시도해주세요 T^T')
 									}
 								}}>
@@ -149,9 +188,9 @@ export default defineComponent({
 								variant="primary"
 								class="w-full"
 								disabled={isLoading.value}
-								onClick={() => {
+								onClick={async () => {
 									try {
-										handleRegister()
+										await handleRegister()
 									} catch (e) {
 										console.error('Unexpected error in onClick:', e)
 										alert('오류가 발생했어요! 나중에 다시 시도해주세요 T^T')
@@ -160,7 +199,7 @@ export default defineComponent({
 								{isLoading.value ? '처리 중...' : '회원가입'}
 							</Button>
 						)}
-						{isLogin && (
+						{isLogin && !isUnmounted.value && (
 							<RouterLink to="/auth/join">
 								<Button variant="secondary" class="w-full">
 									회원가입

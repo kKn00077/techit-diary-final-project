@@ -1,29 +1,63 @@
+import { computed, defineComponent, ref, onBeforeUnmount } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
-export default function Menu(props, { slots }) {
-	const {
-		url: URL = '/diary/list',
-		leftIcon: LeftIcon = null, // 왼쪽 아이콘
-		onClick = () => {}
-	} = props
+export default defineComponent({
+	props: {
+		url: {
+			type: String,
+			default: '/diary/list'
+		},
+		leftIcon: {
+			type: Object,
+			default: null
+		},
+		onClick: {
+			type: Function,
+			default: () => {}
+		}
+	},
+	setup(props, { slots }) {
+		const isUnmounted = ref(false)
+		const iconSize = 'size-6'
 
-	const iconSize = 'size-6'
+		// 라우터 정보 가져오기
+		const route = useRoute()
 
-	// 현재 URL과 일치하는지 확인
-	const route = useRoute()
-	const isActive =
-		(URL == '/diary/list' && route.path.includes('/diary/detail')) ||
-		route.path === URL
+		// 현재 경로와 메뉴 URL 비교
+		const normalizePath = (path) => path.replace(/\/$/, '')
 
-	return (
-		<RouterLink
-			to={URL}
-			class={`flex flex-row gap-2 px-3 py-2 rounded-rounded-3 font-gowun-batang 
-             text-Black-black-1100 cursor-pointer custom-text-base text-base
-            ${isActive ? 'bg-Purple-purple-100' : 'hover:bg-Black-black-400'}`} // 조건부 스타일 추가
-			onClick={onClick}>
-			{LeftIcon && <LeftIcon class={`${iconSize} fill-Black-black-1000`} />}
-			{slots.default ? slots.default() : 'Menu'}
-		</RouterLink>
-	)
-}
+		const isActive = computed(() => {
+			return (
+				normalizePath(props.url) === normalizePath(route.path) ||
+				(props.url === '/diary/list' && route.path.includes('/diary/detail'))
+			)
+		})
+
+		// 컴포넌트 언마운트 시 처리
+		onBeforeUnmount(() => {
+			isUnmounted.value = true
+		})
+
+		if (isUnmounted.value) {
+			return null
+		}
+
+		// JSX 반환
+		return () => (
+			<RouterLink
+				to={props.url}
+				class={`flex flex-row gap-2 px-3 py-2 rounded-rounded-3 font-gowun-batang 
+        text-Black-black-1100 cursor-pointer custom-text-base text-base
+        ${isActive.value ? 'bg-Purple-purple-100' : 'hover:bg-Black-black-400'}`}
+				onClick={props.onClick}>
+				{/* LeftIcon이 있다면 렌더링 */}
+				{props.leftIcon && (
+					<props.leftIcon class={`${iconSize} fill-Black-black-1000`} />
+				)}
+
+				{/* slots가 없다면 기본 텍스트 'Menu' 사용 */}
+				{slots.default ? slots.default() : 'Menu'}
+			</RouterLink>
+		)
+	}
+})
